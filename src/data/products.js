@@ -5,7 +5,7 @@ export default [
     title: 'Радиочастотная гарнитура Logitech G935',
     price: 13999,
     image: '/img/my/1.jpg',
-    color: [1, 2, 3, 6],
+    color: [1, 2, 5],
   },
   {
     id: 2,
@@ -13,7 +13,7 @@ export default [
     title: 'Клавиатура проводная Redragon Broadsword Pro',
     price: 6999,
     image: '/img/my/2.jpg',
-    color: [2, 4, 7, 10, 11],
+    color: [1, 4, 11],
   },
   {
     id: 3,
@@ -21,7 +21,7 @@ export default [
     title: 'Компактная камера Canon PowerShot SX70 HS',
     price: 73099,
     image: '/img/my/3.jpg',
-    color: [3, 4, 6],
+    color: [2, 12],
   },
   {
     id: 4,
@@ -29,7 +29,7 @@ export default [
     title: '49" Монитор Samsung Odyssey G9',
     price: 141999,
     image: '/img/my/4.jpg',
-    color: [5, 6, 7, 8, 9],
+    color: [4, 6, 8, 10, 12],
   },
   {
     id: 5,
@@ -37,7 +37,7 @@ export default [
     title: 'Видеокарта MSI GeForce RTX 3090 Ti SUPRIM X',
     price: 109999,
     image: '/img/my/5.jpg',
-    color: [2, 6, 7, 8, 16],
+    color: [2, 4, 7, 8],
   },
   {
     id: 6,
@@ -45,7 +45,7 @@ export default [
     title: 'Материнская плата ASUS ROG STRIX X299-E GAMING II',
     price: 33499,
     image: '/img/my/6.jpg',
-    color: [3, 7, 11, 15, 16],
+    color: [7, 15, 16],
   },
   {
     id: 7,
@@ -61,7 +61,7 @@ export default [
     title: 'Процессор Intel Core i9-10980XE BOX',
     price: 86299,
     image: '/img/my/8.jpg',
-    color: [2, 10, 11, 12, 13],
+    color: [2, 10, 12],
   },
   {
     id: 9,

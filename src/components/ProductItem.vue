@@ -1,4 +1,3 @@
-/* eslint-disable */
 <template>
   <li class="catalog__item">
 
@@ -17,54 +16,35 @@
     </span>
 
     <ul class="colors colors--black">
-      <ProductItemColor
-        v-for="(color, value) in filterColors"
-        :key="value"
-        :colors="color"
-        :value="currentColor"
-        @input="currentColor = $event"
-      >
-      </ProductItemColor>
+      <ProductItemColors
+        v-for="(color, index) in product.color"
+        :key="color"
+        :colorId="color"
+        :activeColor="activeColor"
+        :parentIndex="parentIndex"
+        :childIndex="index"
+        @input="activeColor = $event"
+      />
     </ul>
   </li>
 </template>
 
 <script>
 import colors from '@/data/colors';
-import ProductItemColor from '@/components/ProductItemColor.vue';
+import ProductItemColors from '@/components/ProductItemColors.vue';
 
 export default {
   name: 'ProductItem',
-  components: { ProductItemColor },
-  props: ['product'],
+  components: { ProductItemColors },
+  props: ['product', 'parentIndex'],
   data() {
     return {
-      currentColor: '#000000',
+      activeColor: 0,
     };
   },
   computed: {
     colors() {
       return colors;
-    },
-    // Создаю массив объектов вида
-    // [ {active: true, color: '#000'}, {active: false, color: '#fff'}, ...]
-    filterColors() {
-      const arr = [];
-      colors.forEach((el) => {
-        this.product.color.forEach((el2) => {
-          if (el2 === el.id) {
-            const obj = {};
-            obj.color = el.color;
-            arr.push(obj);
-          }
-        });
-      });
-      const asd = arr.map((f) => f.color).indexOf(this.currentColor);
-      for (let i = 0; i < arr.length; i += 1) {
-        arr[i].active = false;
-      }
-      if (asd !== -1) arr[asd].active = true;
-      return arr;
     },
   },
 };
