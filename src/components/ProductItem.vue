@@ -1,9 +1,6 @@
 <template>
-  <ul class="catalog__list">
-  <li
-    class="catalog__item"
-    v-for="(product, index) in $attrs.products"
-    :key="index">
+  <li class="catalog__item">
+
     <a class="catalog__pic" href="#">
       <img :src="product.image" :alt="product.title ">
     </a>
@@ -19,55 +16,41 @@
     </span>
 
     <ul class="colors colors--black">
-      <li class="colors__item">
-        <label class="colors__label" for="input">
-          <input
-            id="input"
-            class="colors__radio sr-only"
-            type="radio"
-            name="color-1"
-            value="#73B6EA"
-            checked="">
-          <span class="colors__value" style="background-color: #73B6EA;">
-          </span>
-        </label>
-      </li>
-      <li class="colors__item">
-        <label class="colors__label" for="input">
-          <input
-            id="input"
-            class="colors__radio sr-only"
-            type="radio"
-            name="color-1"
-            value="#8BE000">
-          <span class="colors__value" style="background-color: #8BE000;">
-          </span>
-        </label>
-      </li>
-      <li class="colors__item">
-        <label class="colors__label" for="input">
-          <input
-            id="input"
-            class="colors__radio sr-only"
-            type="radio"
-            name="color-1"
-            value="#222">
-          <span class="colors__value" style="background-color: #222;">
-          </span>
-        </label>
-      </li>
+      <ProductItemColors
+        v-for="(color, index) in product.color"
+        :key="color"
+        :colorId="color"
+        :activeColor="activeColor"
+        :parentIndex="parentIndex"
+        :childIndex="index"
+        @input="activeColor = $event"
+      />
     </ul>
   </li>
-
-  </ul>
 </template>
 
 <script>
+import colors from '@/data/colors';
+import ProductItemColors from '@/components/ProductItemColors.vue';
+
 export default {
   name: 'ProductItem',
-  // props: ['qwerty'],
+  components: { ProductItemColors },
+  props: ['product', 'parentIndex'],
+  data() {
+    return {
+      activeColor: 0,
+    };
+  },
+  computed: {
+    colors() {
+      return colors;
+    },
+  },
 };
 </script>
 
 <style scoped lang="sass">
+  .catalog__pic img
+    object-fit: contain
 </style>
