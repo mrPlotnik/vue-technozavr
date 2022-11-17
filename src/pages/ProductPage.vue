@@ -1,24 +1,22 @@
 <template>
-    <main class="content container">
+  <main class="content container">
     <div class="content__top">
       <ul class="breadcrumbs">
         <li class="breadcrumbs__item">
-          <a
+          <router-link
             class="breadcrumbs__link"
-            href="index.html"
-            @click.prevent="gotoPage('main')"
+            :to="{name: 'main'}"
           >
             Каталог
-          </a>
+          </router-link>
         </li>
         <li class="breadcrumbs__item">
-          <a
+          <router-link
             class="breadcrumbs__link"
-            href="#"
-            @click.prevent="gotoPage('main')"
+            :to="{name: 'main'}"
           >
             {{ category.title}}
-          </a>
+          </router-link>
         </li>
         <li class="breadcrumbs__item">
           <a class="breadcrumbs__link">
@@ -72,7 +70,13 @@
           {{ product.title }}
         </h2>
         <div class="item__form">
-          <form class="form" action="#" method="POST">
+
+          <form
+            class="form"
+            action="#"
+            method="POST"
+            @submit.prevent="addToCart"
+          >
             <b class="item__price">
               {{ product.price | numberFormat }}
             </b>
@@ -142,19 +146,37 @@
 
             <div class="item__row">
               <div class="form__counter">
-                <button type="button" aria-label="Убрать один товар">
+
+                <button
+                  type="button"
+                  aria-label="Убрать один товар"
+                  @click.prevent="decrement"
+                >
                   <svg width="12" height="12" fill="currentColor">
                     <use xlink:href="#icon-minus"></use>
                   </svg>
                 </button>
-                <label class="" for="qwe2">
-                  <input id="qwe2" type="text" value="1" name="count">
+
+                <label class="" :for="'product-count'">
+                  <input
+                    :id="'product-count'"
+                    type="text"
+                    value="1"
+                    name="count"
+                    v-model.number="productAmount"
+                  >
                 </label>
-                <button type="button" aria-label="Добавить один товар">
+
+                <button
+                  type="button"
+                  aria-label="Добавить один товар"
+                  @click.prevent="productAmount += 1"
+                >
                   <svg width="12" height="12" fill="currentColor">
                     <use xlink:href="#icon-plus"></use>
                   </svg>
                 </button>
+
               </div>
 
               <button class="button button--primery" type="submit">
@@ -243,13 +265,18 @@ import gotoPage from '@/helpers/gotoPage';
 import numberFormat from '@/helpers/numberFormat';
 
 export default {
-  props: ['pageParams'],
+  name: 'ProductPage',
+  data() {
+    return {
+      productAmount: 1,
+    };
+  },
   filters: {
     numberFormat,
   },
   computed: {
     product() {
-      return products.find((p) => p.id === this.pageParams.id);
+      return products.find((p) => p.id === +this.$route.params.id);
     },
     category() {
       return categories.find((c) => c.id === this.product.categoryId);
@@ -257,6 +284,17 @@ export default {
   },
   methods: {
     gotoPage,
+    addToCart() {
+      this.$store.commit(
+        'addProductToCart',
+        { productId: this.product.id, amount: this.productAmount },
+      );
+    },
+    decrement() {
+      if (this.productAmount > 1) {
+        this.productAmount -= 1;
+      }
+    },
   },
 };
 </script>
