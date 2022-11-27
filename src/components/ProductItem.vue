@@ -20,13 +20,12 @@
 
     <ul class="colors colors--black">
       <ProductItemColors
-        v-for="(color, index) in product.color"
-        :key="color"
-        :colorId="color"
-        :activeColor="activeColor"
-        :parentIndex="parentIndex"
-        :childIndex="index"
-        @input="activeColor = $event"
+        v-for="color in product.colors"
+        :key="color.id"
+        :parentIndex = parentIndex
+        :color="color"
+        :activeColorCode = activeColorCode
+        @input="activeColorCode = $event"
       />
     </ul>
   </li>
@@ -34,7 +33,6 @@
 
 <script>
 import gotoPage from '@/helpers/gotoPage';
-import colors from '@/data/colors';
 import ProductItemColors from '@/components/ProductItemColors.vue';
 import numberFormat from '@/helpers/numberFormat';
 
@@ -44,17 +42,13 @@ export default {
   props: ['product', 'parentIndex'],
   data() {
     return {
-      activeColor: 0,
+      activeColorCode: this.product.colors[0].code,
     };
   },
   filters: {
     numberFormat,
   },
-  computed: {
-    colors() {
-      return colors;
-    },
-  },
+  computed: {},
   methods: {
     gotoPage,
   },

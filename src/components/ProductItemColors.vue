@@ -1,40 +1,34 @@
 <template>
   <li class="colors__item">
-    <label class="colors__label" :for="'color_' + parentIndex + childIndex">
+    <label class="colors__label" :for="'item-' + parentIndex + '-color-' + color.id">
       <input
-        :id="'color_' + parentIndex + childIndex"
+        :id="'item-' + parentIndex + '-color-' + color.id"
         class="colors__radio sr-only"
         type="radio"
-        :value="colorId"
+        :value="color.code"
         :checked="check"
-        @input="$emit('input', Number($event.target.value))"
+        @input="$emit('input', $event.target.value)"
       >
-      <span class="colors__value" :style="{'background-color': allColors[colorId-1].color}"></span>
+      <span class="colors__value" :style="{'background-color': color.code}"></span>
     </label>
   </li>
 </template>
 
 <script>
-import allColors from '@/data/colors';
 
 export default {
   name: 'ProductItemColor',
-  props: ['colorId', 'activeColor', 'parentIndex', 'childIndex'],
+  props: ['color', 'parentIndex', 'activeColorCode'],
   data() {
     return {};
   },
   computed: {
-    allColors() {
-      return allColors;
-    },
     check() {
-      if (this.activeColor === 0) {
-        return this.childIndex === 0;
-      }
-      return this.colorId === this.activeColor;
+      return this.activeColorCode === this.color.code;
     },
   },
 };
+
 </script>
 <style scoped lang="sass">
 .colors__value

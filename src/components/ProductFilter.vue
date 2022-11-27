@@ -65,9 +65,9 @@
         <legend class="form__legend">Цвет</legend>
         <ul class="colors">
           <ProductFilterAllColors
-            v-for="color in allColors"
+            v-for="color in colors"
             :key="color.id"
-            :colorId="color.id"
+            :color="color"
             :activeColor="currentActiveColor"
             @input="currentActiveColor = $event"
           />
@@ -156,9 +156,9 @@
 </template>
 
 <script>
-import categories from '@/data/categories';
-import allColors from '@/data/colors';
 import ProductFilterAllColors from '@/components/ProductFilterAllColors.vue';
+import axios from 'axios';
+import API_BASE_URL from '../config';
 
 export default {
   name: 'ProductFilter',
@@ -169,6 +169,8 @@ export default {
       currentPriceTo: 0,
       currentCategoryId: 0,
       currentActiveColor: null,
+      categoriesData: null,
+      colorsData: null,
     };
   },
   props: [
@@ -179,10 +181,10 @@ export default {
   ],
   computed: {
     categories() {
-      return categories;
+      return this.categoriesData ? this.categoriesData.items : [];
     },
-    allColors() {
-      return allColors;
+    colors() {
+      return this.colorsData ? this.colorsData.items : [];
     },
   },
   watch: {
@@ -212,6 +214,22 @@ export default {
       this.$emit('update:categoryId', 0);
       this.$emit('update:activeColor', null);
     },
+    loadCategories() {
+      axios.get(`${API_BASE_URL}/api/productCategories`)
+        .then((response) => {
+          this.categoriesData = response.data;
+        });
+    },
+    loadColors() {
+      axios.get(`${API_BASE_URL}/api/colors`)
+        .then((response) => {
+          this.colorsData = response.data;
+        });
+    },
+  },
+  created() {
+    this.loadCategories();
+    this.loadColors();
   },
 };
 </script>
