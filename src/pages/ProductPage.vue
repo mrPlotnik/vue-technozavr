@@ -1,6 +1,6 @@
 <template>
   <PreLoader v-if="productsLoading"/>
-  <main class="content container" v-else-if="productsLoadingFailed"></main>
+  <main class="content container" v-else-if="productsLoadingFailed">Что-то пошло не так</main>
   <main class="content container" v-else>
     <div class="content__top">
       <ul class="breadcrumbs">
@@ -59,33 +59,19 @@
             <fieldset class="form__block">
               <legend class="form__legend">Цвет:</legend>
               <ul class="colors">
-                <li class="colors__item">
-                  <label class="colors__label" for="qwe">
-                    <input id="qwe" class="colors__radio sr-only" type="radio"
-                      name="color-item" value="blue" checked="">
-                    <span class="colors__value" style="background-color: #73B6EA;">
-                    </span>
-                  </label>
-                </li>
-                <li class="colors__item">
-                  <label class="colors__label" for="qwe">
-                    <input id="qwe" class="colors__radio sr-only" type="radio"
-                      name="color-item" value="yellow">
-                    <span class="colors__value" style="background-color: #FFBE15;">
-                    </span>
-                  </label>
-                </li>
-                <li class="colors__item">
-                  <label class="colors__label" for="qwe">
-                    <input id="qwe" class="colors__radio sr-only" type="radio"
-                      name="color-item" value="gray">
-                    <span class="colors__value" style="background-color: #939393;"></span>
-                  </label>
-                </li>
+
+                <ProductColors
+                  v-for="color in colors"
+                  :key="color.id"
+                  :color="color"
+                  :activeColorCode="activeColorCode"
+                  @input="activeColorCode = $event"
+                />
+
               </ul>
             </fieldset>
 
-            <fieldset class="form__block">
+            <!-- <fieldset class="form__block">
               <legend class="form__legend">Объемб в ГБ:</legend>
 
               <ul class="sizes sizes--primery">
@@ -117,7 +103,7 @@
                   </label>
                 </li>
               </ul>
-            </fieldset>
+            </fieldset> -->
 
             <div class="item__row">
               <div class="form__counter">
@@ -243,6 +229,7 @@
 
 <script>
 import PreLoader from '@/components/PreLoader.vue';
+import ProductColors from '@/components/product/ProductColors.vue';
 import gotoPage from '@/helpers/gotoPage';
 import numberFormat from '@/helpers/numberFormat';
 import axios from 'axios';
@@ -251,7 +238,7 @@ import API_BASE_URL from '../config';
 
 export default {
   name: 'ProductPage',
-  components: { PreLoader },
+  components: { PreLoader, ProductColors },
   data() {
     return {
       productAmount: 1,
@@ -260,6 +247,7 @@ export default {
       productsLoadingFailed: false,
       productAdded: false,
       productAddSending: false,
+      activeColorCode: null,
     };
   },
   filters: {
@@ -271,6 +259,9 @@ export default {
     },
     category() {
       return this.productData.category;
+    },
+    colors() {
+      return this.productData.colors;
     },
   },
   methods: {
@@ -296,6 +287,7 @@ export default {
       axios(`${API_BASE_URL}/api/products/${this.$route.params.id}`)
         .then((response) => {
           this.productData = response.data;
+          this.activeColorCode = this.productData.colors[0].code;
         })
         .catch(() => {
           this.productsLoadingFailed = true;
