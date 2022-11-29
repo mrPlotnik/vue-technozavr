@@ -1,5 +1,7 @@
 <template>
-  <main class="content container">
+  <PreLoader v-if="productsLoading"/>
+  <main class="content container" v-else-if="productsLoadingFailed"></main>
+  <main class="content container" v-else>
     <div class="content__top">
       <ul class="breadcrumbs">
         <li class="breadcrumbs__item">
@@ -25,7 +27,6 @@
         </li>
       </ul>
     </div>
-
     <section class="item">
       <div class="item__pics pics">
         <div class="pics__wrapper">
@@ -36,32 +37,6 @@
             :alt="product.title"
           >
         </div>
-        <ul class="pics__list">
-          <li class="pics__item">
-            <a href="" class="pics__link pics__link--current">
-              <img width="98" height="98" src="img/phone-square-1.jpg"
-                srcset="img/phone-square-1@2x.jpg 2x" alt="Название товара">
-            </a>
-          </li>
-          <li class="pics__item">
-            <a href="" class="pics__link">
-              <img width="98" height="98" src="img/phone-square-2.jpg"
-              srcset="img/phone-square-2@2x.jpg 2x" alt="Название товара">
-            </a>
-          </li>
-          <li class="pics__item">
-            <a href="" class="pics__link">
-              <img width="98" height="98" src="img/phone-square-3.jpg"
-              srcset="img/phone-square-3@2x.jpg 2x" alt="Название товара">
-            </a>
-          </li>
-          <li class="pics__item">
-            <a class="pics__link" href="#">
-              <img width="98" height="98" src="img/phone-square-4.jpg"
-              srcset="img/phone-square-4@2x.jpg 2x" alt="Название товара">
-            </a>
-          </li>
-        </ul>
       </div>
 
       <div class="item__info">
@@ -179,9 +154,17 @@
 
               </div>
 
-              <button class="button button--primery" type="submit">
+              <button
+                class="button button--primery"
+                type="submit"
+                :disabled="productAddSending"
+                >
                 В корзину
               </button>
+
+              <div v-show="productAdded">Товар добавлен в корзину</div>
+              <div v-show="productAddSending">Добавляем товар в корзину...</div>
+
             </div>
           </form>
         </div>
@@ -259,16 +242,24 @@
 </template>
 
 <script>
-import products from '@/data/products';
-import categories from '@/data/categories';
+import PreLoader from '@/components/PreLoader.vue';
 import gotoPage from '@/helpers/gotoPage';
 import numberFormat from '@/helpers/numberFormat';
+import axios from 'axios';
+import { mapActions } from 'vuex';
+import API_BASE_URL from '../config';
 
 export default {
   name: 'ProductPage',
+  components: { PreLoader },
   data() {
     return {
       productAmount: 1,
+      productData: null,
+      productsLoading: true,
+      productsLoadingFailed: false,
+      productAdded: false,
+      productAddSending: false,
     };
   },
   filters: {
@@ -276,24 +267,53 @@ export default {
   },
   computed: {
     product() {
-      return products.find((p) => p.id === +this.$route.params.id);
+      return { ...this.productData, image: this.productData.image.file.url };
     },
     category() {
-      return categories.find((c) => c.id === this.product.categoryId);
+      return this.productData.category;
     },
   },
   methods: {
+    ...mapActions(['addProductToCart']),
     gotoPage,
     addToCart() {
-      this.$store.commit(
-        'addProductToCart',
-        { productId: this.product.id, amount: this.productAmount },
-      );
+      this.productAdded = false;
+      this.productAddSending = true;
+      this.addProductToCart({ productId: this.product.id, amount: this.productAmount })
+        .then(() => {
+          this.productAdded = true;
+          this.productAddSending = false;
+        });
     },
     decrement() {
       if (this.productAmount > 1) {
         this.productAmount -= 1;
       }
+    },
+    loadProducts() {
+      this.productsLoading = true;
+      this.productsLoadingFailed = false;
+      axios(`${API_BASE_URL}/api/products/${this.$route.params.id}`)
+        .then((response) => {
+          this.productData = response.data;
+        })
+        .catch(() => {
+          this.productsLoadingFailed = true;
+        })
+        .then(() => {
+          this.productsLoading = false;
+        });
+    },
+  },
+  created() {
+    this.loadProducts();
+  },
+  watch: {
+    '$route.params.id': {
+      handler() {
+        this.loadProducts();
+      },
+      immediate: true,
     },
   },
 };

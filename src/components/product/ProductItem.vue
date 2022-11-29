@@ -33,7 +33,7 @@
 
 <script>
 import gotoPage from '@/helpers/gotoPage';
-import ProductItemColors from '@/components/ProductItemColors.vue';
+import ProductItemColors from '@/components/product/ProductColors.vue';
 import numberFormat from '@/helpers/numberFormat';
 
 export default {

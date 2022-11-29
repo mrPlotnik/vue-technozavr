@@ -156,9 +156,9 @@
 </template>
 
 <script>
-import ProductFilterAllColors from '@/components/ProductFilterAllColors.vue';
+import ProductFilterAllColors from '@/components/filter/ProductFilterAllColors.vue';
 import axios from 'axios';
-import API_BASE_URL from '../config';
+import API_BASE_URL from '@/config';
 
 export default {
   name: 'ProductFilter',
