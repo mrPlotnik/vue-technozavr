@@ -1,18 +1,19 @@
 <template>
 
   <BaseFormField
-    class="form__input-wrap"
+    :class="classParent"
     :title="title"
     :error="error"
   >
-    <label class="form__label" :for="id">
+    <label :class="classLabel" :for="id">
       <input
         :id="id"
-        class="form__input"
+        :class="classInput"
         :type="type"
         :placeholder="placeholder"
         v-model="dataValue"
       >
+      <span class="form__value">{{ title }}</span>
     </label>
   </BaseFormField>
 

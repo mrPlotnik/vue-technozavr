@@ -13,27 +13,25 @@
       <fieldset class="form__block">
         <legend class="form__legend">Цена</legend>
 
-        <label class="form__label form__label--price" for="price-from">
-          <input
-            id="price-from"
-            class="form__input"
-            type="text"
-            name="min-price"
-            v-model.number="currentPriceFrom"
-          >
-          <span class="form__value">От</span>
-        </label>
+        <BaseFormText
+          id="filter-from"
+          classParent="form__input-wrap--price"
+          classLabel="form__label form__label--price"
+          classInput="form__input"
+          title="От"
+          type="text"
+          v-model.number="currentPriceFrom"
+        />
 
-        <label class="form__label form__label--price" for="price-to">
-          <input
-            id="price-to"
-            class="form__input"
-            type="text"
-            name="max-price"
-            v-model.number="currentPriceTo"
-          >
-          <span class="form__value">До</span>
-        </label>
+        <BaseFormText
+          id="filter-to"
+          classParent="form__input-wrap--price"
+          classLabel="form__label form__label--price"
+          classInput="form__input"
+          title="До"
+          type="text"
+          v-model.number="currentPriceTo"
+        />
 
       </fieldset>
 
@@ -156,29 +154,26 @@
 </template>
 
 <script>
+import BaseFormText from '@/components/BaseFormText.vue';
 import ProductFilterAllColors from '@/components/filter/ProductFilterAllColors.vue';
 import axios from 'axios';
 import API_BASE_URL from '@/config';
 
 export default {
   name: 'ProductFilter',
-  components: { ProductFilterAllColors },
+  components: { ProductFilterAllColors, BaseFormText },
   data() {
     return {
       currentPriceFrom: 0,
       currentPriceTo: 0,
       currentCategoryId: 0,
       currentActiveColor: null,
+
       categoriesData: null,
       colorsData: null,
     };
   },
-  props: [
-    'priceFrom',
-    'priceTo',
-    'categoryId',
-    'activeColor',
-  ],
+  props: ['priceFrom', 'priceTo', 'categoryId', 'activeColor'],
   computed: {
     categories() {
       return this.categoriesData ? this.categoriesData.items : [];
@@ -214,12 +209,14 @@ export default {
       this.$emit('update:categoryId', 0);
       this.$emit('update:activeColor', null);
     },
+    // Загружаем список категорий
     loadCategories() {
       axios.get(`${API_BASE_URL}/api/productCategories`)
         .then((response) => {
           this.categoriesData = response.data;
         });
     },
+    // Загружаем список цветов
     loadColors() {
       axios.get(`${API_BASE_URL}/api/colors`)
         .then((response) => {

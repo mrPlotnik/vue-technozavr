@@ -1,17 +1,18 @@
 <template>
 
   <BaseFormField
-    class="form__input-wrap--area"
+     :class="classParent"
     :title="title"
     :error="error"
   >
-    <label class="form__label" :for="id">
+    <label :class="classLabel" :for="id">
       <textarea
         :id="id"
-        class="form__input form__input--area"
+        :class="classInput"
         :placeholder="placeholder"
         v-model="dataValue"
       ></textarea>
+      <span class="form__value">{{ title }}</span>
     </label>
   </BaseFormField>
 

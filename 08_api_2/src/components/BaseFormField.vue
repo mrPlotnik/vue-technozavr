@@ -1,7 +1,6 @@
 <template>
-  <div class="PRO">
+  <div>
     <slot/>
-    <span class="form__value">{{ title }}</span>
     <span class="form__error" v-if="error">
       {{ error }}
     </span>

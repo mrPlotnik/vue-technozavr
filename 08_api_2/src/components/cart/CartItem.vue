@@ -19,7 +19,7 @@
       <button
         type="button"
         aria-label="Убрать один товар"
-        @click.prevent="amount = xCrement(amount, false)"
+        @click.prevent="quantity = xCrement(quantity, false)"
       >
         <svg width="10" height="10" fill="currentColor">
           <use xlink:href="#icon-minus"></use>
@@ -30,7 +30,7 @@
         <input
           id="qwe"
           type="text"
-          v-model.number="amount"
+          v-model.number="quantity"
           @keypress="onlyNumeric($event)"
           name="count"
         >
@@ -39,7 +39,7 @@
       <button
         type="button"
         aria-label="Добавить один товар"
-        @click.prevent="amount = xCrement(amount, true)"
+        @click.prevent="quantity = xCrement(quantity, true)"
       >
         <svg width="10" height="10" fill="currentColor">
           <use xlink:href="#icon-plus"></use>
@@ -48,7 +48,7 @@
     </div>
 
     <b class="product__price">
-      {{ amount * item.product.price | numberFormat }} ₽
+      {{ quantity * item.product.price | numberFormat }} ₽
     </b>
 
     <button
@@ -75,13 +75,13 @@ export default {
   filters: { numberFormat },
   props: ['item'],
   computed: {
-    amount: {
+    quantity: {
       get() {
-        return this.item.amount;
+        return this.item.quantity;
       },
       // при изменении поля
       set(value) {
-        this.$store.dispatch('updateCartProductAmount', { productId: this.item.productId, amount: value });
+        this.$store.dispatch('updateCartProductQuantity', { productId: this.item.productId, amount: value });
       },
     },
   },

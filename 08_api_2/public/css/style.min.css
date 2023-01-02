@@ -312,16 +312,20 @@ a {
     line-height: 1
 }
 
-/* .form__label {
+.form__label {
     position: relative;
     display: block;
     background-color: #fff;
     color: #737373
-} */
+}  
 
 /* .form__label:not(:last-child) {
     margin-bottom: 25px
 } */
+
+.form__input-wrap--price:not(:last-child) {
+    margin-bottom: 15px;
+}
 
 .form__label--price::after {
     content: '₽';
@@ -347,17 +351,38 @@ a {
     background-size: contain
 }
 
-/* .form__value {
+
+
+
+
+.form__input-wrap {
+    position: relative;
+    width: calc(50% - 5px);
+}
+
+.form__input-wrap:not(:last-child) {
+    margin-bottom: 20px;
+}
+
+.form__input-wrap--area {
+    width: 100%;
+}
+ 
+
+
+
+
+.form__value {
     position: absolute;
     top: 10px;
     left: 20px;
     font-size: 12px;
     line-height: 1;
-    color: #737373;
+    /* color: #737373; */
     font-weight: 300
-} */
+}
 
-/* .form__input {
+.form__input {
     padding: 28px 45px 13px 20px;
     width: 100%;
     height: 65px;
@@ -372,7 +397,7 @@ a {
     font-size: 16px;
     font-family: inherit;
     line-height: 1
-} */
+}
 
 .form__input:focus,
 .form__input:hover {
@@ -787,9 +812,17 @@ a {
     margin-bottom: 15px
 } */
 
-/* .cart__data label:not(:nth-child(4)):not(:nth-child(3)) {
+.cart__data {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+  
+
+.cart__data label:not(:nth-child(4)):not(:nth-child(3)) {
     grid-column: 1/-1
-} */
+}
 
 .cart__title {
     margin: 0 0 20px;

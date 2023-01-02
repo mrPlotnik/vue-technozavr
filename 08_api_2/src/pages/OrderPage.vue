@@ -33,7 +33,10 @@
           <div class="cart__data">
 
             <BaseFormText
-              id="fullname"
+              id="order-fullname"
+              classParent="form__input-wrap"
+              classLabel="form__label"
+              classInput="form__input"
               title="ФИО"
               type="text"
               :error="formError.name"
@@ -42,7 +45,10 @@
             />
 
             <BaseFormText
-              id="address"
+              id="order-address"
+              classParent="form__input-wrap"
+              classLabel="form__label"
+              classInput="form__input"
               title="Адрес"
               type="text"
               :error="formError.address"
@@ -51,7 +57,10 @@
             />
 
             <BaseFormText
-              id="tel"
+              id="order-tel"
+              classParent="form__input-wrap"
+              classLabel="form__label"
+              classInput="form__input"
               title="Телефон"
               type="tel"
               :error="formError.phone"
@@ -60,7 +69,10 @@
             />
 
             <BaseFormText
-              id="email"
+              id="order-email"
+              classParent="form__input-wrap"
+              classLabel="form__label"
+              classInput="form__input"
               title="Email"
               type="email"
               :error="formError.email"
@@ -69,7 +81,10 @@
             />
 
             <BaseFormTextarea
-              id="comments"
+              id="order-comments"
+              classParent="form__input-wrap--area"
+              classLabel="form__label"
+              classInput="form__input form__input--area"
               title="Комментарий к заказу"
               type="text"
               :error="formError.comments"
@@ -197,52 +212,3 @@ export default {
   },
 };
 </script>
-
-<style lang="sass">
-
-.cart__data
-  display: flex
-  flex-wrap: wrap
-  justify-content: space-between
-  margin-bottom: 30px
-
-.form__input-wrap
-  position: relative
-  width: calc(50% - 5px)
-
-.form__input-wrap:not(:last-child)
-  margin-bottom: 20px
-
-.form__input-wrap--area
-  width: 100%
-
-.form__label
-  display: block
-  background-color: #fff
-  color: #737373
-
-.form__input
-  padding: 28px 45px 13px 20px
-  width: 100%
-  height: 65px
-  border-radius: 0
-  background-color: transparent
-  border: 1px solid #cfcfcf
-  -webkit-box-shadow: none
-  box-shadow: none
-  -webkit-transition: all .2s ease
-  transition: all .2s ease
-  color: #222
-  font-size: 16px
-  font-family: inherit
-  line-height: 1
-
-.form__value
-  position: absolute
-  top: 10px
-  left: 20px
-  font-size: 12px
-  line-height: 1
-  font-weight: 300
-
-</style>

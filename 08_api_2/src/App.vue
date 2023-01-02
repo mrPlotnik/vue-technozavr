@@ -2,6 +2,7 @@
   <div>
 
     <Header/>
+    <!-- компонент, соответствующий маршруту, будет отображаться здесь -->
     <router-view/>
     <Footer/>
 
@@ -19,11 +20,15 @@ export default {
     ...mapActions(['loadCart']),
     ...mapMutations(['updateUserAccessKey']),
   },
+  // В хуке created
   created() {
+    // Проверяем наличие ключа корзины в localStorage
     const userAccessKey = localStorage.getItem('userAccessKey');
+    // Если ключ есть, вызываем мутацию
     if (userAccessKey) {
       this.updateUserAccessKey(userAccessKey);
     }
+    // вызываем экшн
     this.loadCart();
   },
 };

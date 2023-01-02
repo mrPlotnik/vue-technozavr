@@ -1,12 +1,8 @@
 <template>
   <main class="content container">
     <div class="content__top content__top--catalog">
-      <h1 class="content__title">
-        Каталог
-      </h1>
-      <span class="content__info">
-        152 товара
-      </span>
+      <h1 class="content__title">Каталог</h1>
+      <span class="content__info">{{ countProducts }} товара</span>
     </div>
 
     <div class="content__catalog">
@@ -44,41 +40,46 @@
 </template>
 
 <script>
+import ProductFilter from '@/components/filter/ProductFilter.vue';
+
 import PreLoader from '@/components/PreLoader.vue';
 import BasePagination from '@/components/BasePagination.vue';
 import ProductList from '@/components/product/ProductList.vue';
-import ProductFilter from '@/components/filter/ProductFilter.vue';
 import axios from 'axios';
 import API_BASE_URL from '../config';
 
 export default {
   name: 'MainPage',
   components: {
-    ProductList,
-    BasePagination,
-    ProductFilter,
-    PreLoader,
+    ProductFilter, ProductList, BasePagination, PreLoader,
   },
   data() {
     return {
+      productsLoading: false,
+      productsLoadingFailed: false,
+
       filterPriceFrom: 0,
       filterPriceTo: 0,
       filterCategoryId: 0,
+      activeColor: null,
+
       page: 1,
       productsPerPage: 3,
-      activeColor: null,
+
       productsData: null,
-      productsLoading: false,
-      productsLoadingFailed: false,
     };
   },
   computed: {
     products() {
+      // Если this.productsData нет
       return this.productsData
+        // Если this.productsData === true, то возвращаем товары
         ? this.productsData.items.map((product) => ({
           ...product,
+          // Указываем где брать ссылку на картинку товара
           image: product.image.file.url,
         }))
+        // Если this.productsData === false, то возвращаем пустой массив
         : [];
     },
     countProducts() {
@@ -87,11 +88,15 @@ export default {
   },
   methods: {
     loadProducts() {
+      // Показываем прелоадер
       this.productsLoading = true;
+      // Ошибок загрузки нет
       this.productsLoadingFailed = false;
+
       clearTimeout(this.loadProductsTimer);
       this.loadProductsTimer = setTimeout(() => {
         axios.get(`${API_BASE_URL}/api/products`, {
+          // Параметры, которые будут передаваться в query-string
           params: {
             page: this.page,
             limit: this.productsPerPage,
@@ -114,9 +119,11 @@ export default {
     },
   },
   watch: {
+    // Следим за page (клики по пагинации)
     page() {
       this.loadProducts();
     },
+    // Следим за свойствами фильтрации
     filterCategoryId() {
       this.loadProducts();
     },
@@ -130,9 +137,13 @@ export default {
       this.loadProducts();
     },
   },
+
+  // В хуке
   created() {
+    // выполняем метод
     this.loadProducts();
   },
+
 };
 </script>
 
