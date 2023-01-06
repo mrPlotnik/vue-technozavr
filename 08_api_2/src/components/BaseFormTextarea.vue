@@ -1,14 +1,14 @@
 <template>
 
   <BaseFormField
-     :class="classParent"
-    :title="title"
-    :error="error"
+    :class="classParent"
   >
     <label :class="classLabel" :for="id">
       <textarea
         :id="id"
         :class="classInput"
+        :name="name"
+        type="text"
         :placeholder="placeholder"
         v-model="dataValue"
       ></textarea>

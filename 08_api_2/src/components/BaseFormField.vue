@@ -10,6 +10,6 @@
 <script>
 export default {
   name: 'BaseFormField',
-  props: ['title', 'error'],
+  props: ['error'],
 };
 </script>

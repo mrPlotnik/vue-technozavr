@@ -2,13 +2,13 @@
 
   <BaseFormField
     :class="classParent"
-    :title="title"
     :error="error"
   >
     <label :class="classLabel" :for="id">
       <input
         :id="id"
         :class="classInput"
+        :name="name"
         :type="type"
         :placeholder="placeholder"
         v-model="dataValue"

@@ -32,6 +32,10 @@ export default new Vuex.Store({
     },
   },
   mutations: {
+    resetCart(state) {
+      state.cartProducts = [];
+      state.cartProductsData = [];
+    },
     updateCartProductQuantity(state, { productId, quantity }) {
       const item = state.cartProducts.find((i) => i.productId === productId);
       if (item) {
@@ -104,8 +108,8 @@ export default new Vuex.Store({
           context.commit('syncCartProducts');
         });
     },
-    updateCartProductquantity(context, { productId, quantity }) {
-      context.commit('updateCartProductquantity', { productId, quantity });
+    updateCartProductQuantity(context, { productId, quantity }) {
+      context.commit('updateCartProductQuantity', { productId, quantity });
       if (quantity < 1) {
         context.commit('syncCartProducts');
         return null;

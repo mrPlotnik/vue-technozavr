@@ -7,6 +7,7 @@ export default {
     'classParent',
     'classLabel',
     'classInput',
+    'name',
     'title',
     'type',
     'error',

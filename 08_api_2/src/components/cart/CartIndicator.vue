@@ -11,13 +11,20 @@
       class="header__count"
       aria-label="Количество товаров"
     >
-      {{ $store.state.cartProducts.length }}
+      {{ totalProducts }}
     </span>
   </router-link>
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
+
 export default {
   name: 'CartIndicator',
+  computed: {
+    ...mapGetters({
+      totalProducts: 'cartTotalProducts',
+    }),
+  },
 };
 </script>

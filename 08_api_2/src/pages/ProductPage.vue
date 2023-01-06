@@ -270,7 +270,7 @@ export default {
     addToCart() {
       this.productAdded = false;
       this.productAddSending = true;
-      this.addProductToCart({ productId: this.product.id, amount: this.productAmount })
+      this.addProductToCart({ productId: this.product.id, quantity: this.productAmount })
         .then(() => {
           this.productAdded = true;
           this.productAddSending = false;

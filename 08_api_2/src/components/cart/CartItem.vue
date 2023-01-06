@@ -81,7 +81,7 @@ export default {
       },
       // при изменении поля
       set(value) {
-        this.$store.dispatch('updateCartProductQuantity', { productId: this.item.productId, amount: value });
+        this.$store.dispatch('updateCartProductQuantity', { productId: this.item.productId, quantity: value });
       },
     },
   },
