@@ -5,7 +5,7 @@
 
         <OrderItem
           v-for="item in products"
-          :key="item.productId"
+          :key="item.id"
           :item="item"
         />
 
@@ -20,9 +20,8 @@
         </p>
       </div>
 
-      <button class="cart__button button button--primery" type="submit">
-        Оформить заказ
-      </button>
+      <slot/>
+
     </div>
 
     <div class="cart__error form__error-block" v-if="error">

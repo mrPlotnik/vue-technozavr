@@ -11,7 +11,7 @@
       <b>{{ item.product.price * item.quantity }}</b>
     </div>
 
-    <span class="cart__article">Артикул: {{ item.productId }}</span>
+    <span class="cart__article">Артикул: {{ item.product.id }}</span>
 
   </li>
 </template>

@@ -10,11 +10,15 @@ export default new Vuex.Store({
     cartProducts: [],
     userAccessKey: null,
     cartProductsData: [],
+    orderInfo: null,
   },
   getters: {
+    orderInfo(state) {
+      return state.orderInfo;
+    },
     cartDetailProducts(state) {
       return state.cartProducts.map((item) => {
-        const { product } = state.cartProductsData.find((p) => p.product.id === item.productId);
+        const { product } = state.cartProductsData.find((p) => p.product.id === item.id);
         return {
           ...item,
           product: {
@@ -32,18 +36,21 @@ export default new Vuex.Store({
     },
   },
   mutations: {
+    updateOrderInfo(state, orderInfo) {
+      state.orderInfo = orderInfo;
+    },
     resetCart(state) {
       state.cartProducts = [];
       state.cartProductsData = [];
     },
     updateCartProductQuantity(state, { productId, quantity }) {
-      const item = state.cartProducts.find((i) => i.productId === productId);
+      const item = state.cartProducts.find((i) => i.id === productId);
       if (item) {
         item.quantity = quantity;
       }
     },
     deleteCartProduct(state, productId) {
-      state.cartProducts = state.cartProducts.filter((item) => item.productId !== productId);
+      state.cartProducts = state.cartProducts.filter((item) => item.id !== productId);
     },
     // Обновляем ключ корзины
     // Вызывается из
@@ -64,12 +71,23 @@ export default new Vuex.Store({
     syncCartProducts(state) {
       // Оставляем только id и quantity
       state.cartProducts = state.cartProductsData.map((item) => ({
-        productId: item.product.id,
+        id: item.product.id,
         quantity: item.quantity,
       }));
     },
   },
   actions: {
+    loadOrderInfo(context, orderId) {
+      return axios
+        .get(`${API_BASE_URL}/api/orders/${orderId}`, {
+          params: {
+            userAccessKey: context.state.userAccessKey,
+          },
+        })
+        .then((response) => {
+          context.commit('updateOrderInfo', response.data);
+        });
+    },
     // Загружаем данные корзины
     loadCart(context) {
       // Запрос. Берем состав корзины

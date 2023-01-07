@@ -45,6 +45,7 @@
           </p>
 
           <router-link
+            v-if="totalProducts !== 0"
             tag="button"
             :to="{name: 'order'}"
             class="cart__button button button--primery"

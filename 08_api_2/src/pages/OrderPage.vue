@@ -24,7 +24,7 @@
         Корзина
       </h1>
       <span class="content__info">
-       {{ totalProducts }}
+       {{ totalProducts }} товара
       </span>
     </div>
 
@@ -109,7 +109,11 @@
           :totelPrice="totelPrice"
           :totalProducts="totalProducts"
           :error="formErrorMessage"
-        />
+        >
+          <button class="cart__button button button--primery" type="submit">
+            Оформить заказ
+          </button>
+        </OrderList>
 
       </form>
     </section>
@@ -136,7 +140,7 @@ export default {
     return {
       preloader: false,
       activeDelivery: null,
-      activePayment: null,
+      activePayment: 'card',
       formError: {},
       formErrorMessage: '',
       inputsText: [
@@ -204,9 +208,11 @@ export default {
             userAccessKey: this.$store.state.userAccessKey,
           },
         })
-        .then(() => {
+        .then((response) => {
           this.preloader = false;
           this.$store.commit('resetCart');
+          this.$store.commit('updateOrderInfo', response.data);
+          this.$router.push({ name: 'orderInfo', params: { id: response.data.id } });
         })
         .catch((error) => {
           this.preloader = false;
