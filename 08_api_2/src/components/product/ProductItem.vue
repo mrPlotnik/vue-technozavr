@@ -15,7 +15,7 @@
     </h3>
 
     <span class="catalog__price">
-      {{ product.price | numberFormat }}
+      {{ product.price | numberFormat }} ₽
     </span>
 
     <ul class="colors colors--black">
@@ -45,9 +45,7 @@ export default {
       activeColorCode: this.product.colors[0].code,
     };
   },
-  filters: {
-    numberFormat,
-  },
+  filters: { numberFormat },
   computed: {},
   methods: {
     gotoPage,

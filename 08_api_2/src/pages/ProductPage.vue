@@ -53,7 +53,7 @@
             @submit.prevent="addToCart"
           >
             <b class="item__price">
-              {{ product.price | numberFormat }}
+              {{ product.price | numberFormat }} ₽
             </b>
 
             <fieldset class="form__block">

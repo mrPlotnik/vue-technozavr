@@ -127,6 +127,7 @@ export default new Vuex.Store({
         });
     },
     updateCartProductQuantity(context, { productId, quantity }) {
+      console.log(productId);
       context.commit('updateCartProductQuantity', { productId, quantity });
       if (quantity < 1) {
         context.commit('syncCartProducts');
