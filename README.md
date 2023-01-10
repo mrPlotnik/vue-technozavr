@@ -20,5 +20,8 @@ npm run build
 npm run lint
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### Запустить скрипт деплоя на сервер
+bash deploy.sh
+
+
+npm i -D
