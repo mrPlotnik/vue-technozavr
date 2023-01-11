@@ -1,5 +1,25 @@
 <template>
-  <div class="loader">loading</div>
+  <div class="preloader-wrap">
+    <div class="loader">
+      <span>L</span>
+      <span>O</span>
+      <span>A</span>
+      <span>D</span>
+      <span>I</span>
+      <span>N</span>
+      <span>G</span>
+
+      <div class="covers">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -9,54 +29,70 @@ export default {
 </script>
 
 <style scoped lang="sass">
-  .loader,
-  .loader:before,
-  .loader:after
-    width: 2.5em
-    height: 2.5em
-    -webkit-animation-fill-mode: both
-    animation-fill-mode: both
-    -webkit-animation: load 1.8s infinite ease-in-out
-    animation: load 1.8s infinite ease-in-out
-
-  .loader
-    color: #000
-    font-size: 10px
-    margin: 80px auto
-    position: relative
-    -webkit-transform: translateZ(0)
-    -ms-transform: translateZ(0)
-    transform: translateZ(0)
-    -webkit-animation-delay: -0.16s
-    animation-delay: -0.16s
-
-  .loader:before,
-  .loader:after
-    content: ''
+  .preloader-wrap
     position: absolute
-    top: 0
+    display: flex
+    align-items: center
+    width: 100%
+    height: 100%
 
-  .loader:before
-    left: -3.5em
-    -webkit-animation-delay: -0.32s
-    animation-delay: -0.32s
+.loader
+  position: relative
+  margin: auto
+  width: 350px
+  color: black
+  font-family: "PressStart"
+  font-size: 200%
+  text-align: center
+  background: #9eff00
+  text-shadow: 5px 5px 5px rgba(0,0,0,0.3)
 
-  .loader:after
-    left: 3.5em
+.loader:after
+  content: ""
+  display: table
+  clear: both
 
-  @-webkit-keyframes load
-    0%,
-    80%,
-    100%
-      box-shadow: 0 2.5em 0 -1.3em
-    40%
-      box-shadow: 0 2.5em 0 0
+span
+  float: left
+  height: 100px
+  line-height: 120px
+  width: 50px
 
-  @keyframes load
-    0%,
-    80%,
-    100%
-      box-shadow: 0 2.5em 0 -1.3em
-    40%
-      box-shadow: 0 2.5em 0 0
+.loader > span
+  border-left: 1px solid #cfff80
+  border-right: 1px solid #8adf00
+
+.covers
+  position: absolute
+  height: 100%
+  width: 100%
+
+.covers span
+  background: white
+  animation: up 1.5s infinite
+
+@keyframes up
+  0%
+    margin-bottom: 0
+  30%
+    margin-bottom: 100%
+    height: 20px
+  50%
+    margin-bottom: 0
+  100%
+    margin-bottom: 0
+
+.covers span:nth-child(2)
+  animation-delay: .142857s
+.covers span:nth-child(3)
+  animation-delay: .285714s
+.covers span:nth-child(4)
+  animation-delay: .428571s
+.covers span:nth-child(5)
+  animation-delay: .571428s
+.covers span:nth-child(6)
+  animation-delay: .714285s
+.covers span:nth-child(7)
+  animation-delay: .857142s
+
 </style>

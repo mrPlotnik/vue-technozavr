@@ -7,6 +7,7 @@
 
     <div class="content__catalog">
 
+      <!-- Здесь показываем фильтр товаров -->
       <ProductFilter
         :price-from.sync="filterPriceFrom"
         :price-to.sync="filterPriceTo"
@@ -16,22 +17,47 @@
 
       <section class="catalog">
 
+        <!-- Пока выполняется запрос к серверу, показываем прелоадер -->
         <PreLoader v-if="productsLoading"/>
 
+        <!-- Если есть ошибка загрузки данных с сервера -->
         <div v-else-if="productsLoadingFailed">
           Произошла ошибка при загрузке товаров<br>
           <button @click.prevent="loadProducts">Попробовать еще раз</button>
         </div>
 
+        <!-- Здесь показываем все товары -->
         <ProductList
           :products="products"
         />
 
+        <!-- Здесь показываем пагинацию -->
         <BasePagination
           :page.sync="page"
           :count="countProducts"
           :per-page="productsPerPage"
         />
+
+        <!-- Указываем сколько товаров отображать на странице -->
+        <div class="catalog__productsPerPage-wrap">
+          <span>Количество товаров на странице</span>
+          <label for="productsPerPage">
+            <select
+              id="productsPerPage"
+              name="productsPerPage"
+              type="text"
+              v-model="productsPerPage"
+            >
+              <option value="3">3</option>
+              <option value="9">9</option>
+              <option value="12">12</option>
+              <option value="18">18</option>
+              <option value="24">24</option>
+              <option value="27">27</option>
+              <option value="32">32</option>
+            </select>
+          </label>
+        </div>
 
       </section>
 
@@ -71,7 +97,6 @@ export default {
   },
   computed: {
     products() {
-      // Если this.productsData нет
       return this.productsData
         // Если this.productsData === true, то возвращаем товары
         ? this.productsData.items.map((product) => ({
@@ -83,6 +108,8 @@ export default {
         : [];
     },
     countProducts() {
+      // Если this.productsData === true, то возвращаем общее количество товаров,
+      // Если this.productsData === false, то возвращаем 0
       return this.productsData ? this.productsData.pagination.total : 0;
     },
   },
@@ -93,37 +120,52 @@ export default {
       // Ошибок загрузки нет
       this.productsLoadingFailed = false;
 
+      // Очищаем таймер
       clearTimeout(this.loadProductsTimer);
+      // Оборачиваем запрос в setTimeout, с нулевой задержкой чтобы при фильтрации
+      // был один запрос на сервер, а не несколько. Выполнится только последний запрос.
+      // this.loadProductsTimer - это свойство экз-ра компонента, а не свойство состояния,
+      // там храним идент-р таймера.
       this.loadProductsTimer = setTimeout(() => {
-        axios.get(`${API_BASE_URL}/api/products`, {
-          // Параметры, которые будут передаваться в query-string
-          params: {
-            page: this.page,
-            limit: this.productsPerPage,
-            categoryId: this.filterCategoryId,
-            minPrice: this.filterPriceFrom,
-            maxPrice: this.filterPriceTo,
-            colorId: this.activeColor,
-          },
-        })
+        axios
+          .get(`${API_BASE_URL}/api/products`, {
+            // Параметры, которые будут передаваться в query-string
+            // Берем их из свойств состояния
+            params: {
+              page: this.page,
+              limit: this.productsPerPage,
+              categoryId: this.filterCategoryId,
+              minPrice: this.filterPriceFrom,
+              maxPrice: this.filterPriceTo,
+              colorId: this.activeColor,
+            },
+          })
           .then((response) => {
             this.productsData = response.data;
           })
+          // Если есть ошибка
           .catch(() => {
             this.productsLoadingFailed = true;
           })
+          // В конце (в любом случае) отключаем прелоадер и показываем
+          // или загруженный список товаров или ошибку загрузки
           .then(() => {
             this.productsLoading = false;
           });
       }, 0);
     },
   },
+  // Следим за свойствоми состояния
   watch: {
-    // Следим за page (клики по пагинации)
+    // При кликах по пагинации
     page() {
       this.loadProducts();
     },
-    // Следим за свойствами фильтрации
+    // При выборе количества товаров для отображения на странице
+    productsPerPage() {
+      this.loadProducts();
+    },
+    // Свойства фильтрации
     filterCategoryId() {
       this.loadProducts();
     },
@@ -137,7 +179,6 @@ export default {
       this.loadProducts();
     },
   },
-
   // В хуке
   created() {
     // выполняем метод
@@ -146,58 +187,3 @@ export default {
 
 };
 </script>
-
-<style scoped lang="sass">
-.loader,
-.loader:before,
-.loader:after
-  width: 2.5em
-  height: 2.5em
-  -webkit-animation-fill-mode: both
-  animation-fill-mode: both
-  -webkit-animation: load 1.8s infinite ease-in-out
-  animation: load 1.8s infinite ease-in-out
-
-.loader
-  color: #000
-  font-size: 10px
-  margin: 80px auto
-  position: relative
-  -webkit-transform: translateZ(0)
-  -ms-transform: translateZ(0)
-  transform: translateZ(0)
-  -webkit-animation-delay: -0.16s
-  animation-delay: -0.16s
-
-.loader:before,
-.loader:after
-  content: ''
-  position: absolute
-  top: 0
-
-.loader:before
-  left: -3.5em
-  -webkit-animation-delay: -0.32s
-  animation-delay: -0.32s
-
-.loader:after
-  left: 3.5em
-
-@-webkit-keyframes load
-  0%,
-  80%,
-  100%
-    box-shadow: 0 2.5em 0 -1.3em
-
-  40%
-    box-shadow: 0 2.5em 0 0
-
-@keyframes load
-  0%,
-  80%,
-  100%
-    box-shadow: 0 2.5em 0 -1.3em
-  40%
-    box-shadow: 0 2.5em 0 0
-
-</style>

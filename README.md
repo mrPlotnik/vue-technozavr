@@ -25,3 +25,4 @@ bash deploy.sh
 
 
 npm i -D
+npm run serve
