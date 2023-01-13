@@ -15,38 +15,53 @@
     </h3>
 
     <span class="catalog__price">
-      {{ product.price | numberFormat }} ₽
+      {{ price | numberFormat }} ₽
     </span>
 
-    <ul class="colors colors--black">
-      <ProductItemColors
-        v-for="color in product.colors"
-        :key="color.id"
-        :parentIndex = parentIndex
-        :color="color"
-        :activeColorCode = activeColorCode
-        @input="activeColorCode = $event"
-      />
-    </ul>
+    <ProductBtns
+      :parentIndex = parentIndex
+      :offerValue="offerValue"
+      :activeOffer="activeOffer"
+      @check="activeOffer = $event"
+    />
+
   </li>
 </template>
 
 <script>
 import gotoPage from '@/helpers/gotoPage';
-import ProductItemColors from '@/components/product/ProductColors.vue';
+import ProductBtns from '@/components/product/ProductBtns.vue';
 import numberFormat from '@/helpers/numberFormat';
 
 export default {
   name: 'ProductItem',
-  components: { ProductItemColors },
+  components: { ProductBtns },
   props: ['product', 'parentIndex'],
   data() {
     return {
+      activeOffer: 0,
       activeColorCode: this.product.colors[0].code,
     };
   },
   filters: { numberFormat },
-  computed: {},
+  computed: {
+    offers() {
+      return this.product.offers;
+    },
+    offerValue() {
+      const arr = [];
+      this.offers.forEach((el) => {
+        el.propValues.forEach((elem) => {
+          const { value } = elem;
+          arr.push(value);
+        });
+      });
+      return arr;
+    },
+    price() {
+      return this.offers[this.activeOffer].price;
+    },
+  },
   methods: {
     gotoPage,
   },

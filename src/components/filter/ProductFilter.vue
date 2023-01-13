@@ -169,6 +169,8 @@ export default {
       currentCategoryId: 0,
       currentActiveColor: null,
 
+      obj: {},
+
       categoriesData: null,
       colorsData: null,
     };
@@ -223,10 +225,33 @@ export default {
           this.colorsData = response.data;
         });
     },
+    loadMemory() {
+      const memoryArr = ['8GB', '16GB', '32GB', '64GB', '128GB'];
+
+      function getProductsByMemory(memoryValue, param) {
+        axios.get(`${API_BASE_URL}/api/products`, {
+          params: {
+            'props[built_in_memory]': [`${memoryValue}`],
+          },
+        });
+        // этот вывод в консоль покажет порядок вызовов
+        console.log(`Запрос на: ${memoryValue} with params: ${param}`);
+        return new Promise((resolve) => { resolve('выполнен'); });
+      }
+
+      function reduceWay(callback) {
+        memoryArr.reduce((acc, item) => acc
+          .then((res) => getProductsByMemory(item, res)), Promise.resolve('1й выполнен'))
+          .then((result) => { callback(result); });
+      }
+
+      reduceWay((result) => console.log(`Итог: ${result}`));
+    },
   },
   created() {
     this.loadCategories();
     this.loadColors();
+    this.loadMemory();
   },
 };
 </script>

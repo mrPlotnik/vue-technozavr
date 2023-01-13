@@ -59,6 +59,8 @@
           </label>
         </div>
 
+        <!-- <button @click="reduceWay([`https://vue-study.skillbox.cc/api/products/1`,`https://vue-study.skillbox.cc/api/products/2`,`https://vue-study.skillbox.cc/api/products/3`])">123</button> -->
+
       </section>
 
     </div>
@@ -90,7 +92,7 @@ export default {
       activeColor: null,
 
       page: 1,
-      productsPerPage: 3,
+      productsPerPage: 12,
 
       productsData: null,
     };
@@ -99,10 +101,10 @@ export default {
     products() {
       return this.productsData
         // Если this.productsData === true, то возвращаем товары
-        ? this.productsData.items.map((product) => ({
-          ...product,
-          // Указываем где брать ссылку на картинку товара
-          image: product.image.file.url,
+        ? this.productsData.items.map((prod) => ({
+          ...prod,
+          // Подмешиваем путь до картинки
+          image: prod.preview.file.url,
         }))
         // Если this.productsData === false, то возвращаем пустой массив
         : [];
@@ -120,6 +122,14 @@ export default {
       // Ошибок загрузки нет
       this.productsLoadingFailed = false;
 
+      // Формируем объект параметров
+      const params = {};
+      // Если свойство фильтрации = true, добавляем его, чтобы передать в параметры запроса
+      if (this.filterPriceFrom) params.minPrice = this.filterPriceFrom;
+      if (this.filterPriceTo) params.maxPrice = this.filterPriceTo;
+      if (this.filterCategoryId) params.categoryId = this.filterCategoryId;
+      if (this.activeColor) params.colorId = this.activeColor;
+
       // Очищаем таймер
       clearTimeout(this.loadProductsTimer);
       // Оборачиваем запрос в setTimeout, с нулевой задержкой чтобы при фильтрации
@@ -134,14 +144,12 @@ export default {
             params: {
               page: this.page,
               limit: this.productsPerPage,
-              categoryId: this.filterCategoryId,
-              minPrice: this.filterPriceFrom,
-              maxPrice: this.filterPriceTo,
-              colorId: this.activeColor,
+              ...params,
             },
           })
           .then((response) => {
             this.productsData = response.data;
+            // console.log(response.data.items[0].);
           })
           // Если есть ошибка
           .catch(() => {
@@ -154,6 +162,29 @@ export default {
           });
       }, 0);
     },
+    // reduceWay(urls) {
+    //   const arr = [];
+
+    //   async function fakeFetch(url) {
+    //     const qwe = await fetch(url);
+    //     const asd = await qwe.json();
+    //     arr.push(asd.id);
+
+    //     // этот вывод в консоль покажет порядок вызовов
+    //     console.log(arr);
+    //     console.log(`fakeFetch to: ${url}`);
+
+    //     return new Promise((resolve) => { resolve('is DONE'); });
+    //   }
+
+    //   function reduceWayF(callback) {
+    //     urls.reduce((acc, item) => acc
+    //       .then((res) => fakeFetch(item, res)), Promise.resolve())
+    //       .then((result) => callback(result));
+    //   }
+
+    //   reduceWayF((result) => console.log(`result: ${result}`));
+    // },
   },
   // Следим за свойствоми состояния
   watch: {
