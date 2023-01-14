@@ -66,73 +66,22 @@
             v-for="color in colors"
             :key="color.id"
             :color="color"
-            :activeColor="currentActiveColor"
-            @input="currentActiveColor = $event"
+            :activeColor="currentColor"
+            @input="currentColor = $event"
           />
         </ul>
       </fieldset>
 
-      <!-- другое -->
-      <!-- <fieldset class="form__block">
+      <!--  -->
+
+      <fieldset class="form__block">
         <legend class="form__legend">Объемб в ГБ</legend>
-        <ul class="check-list">
-          <li class="check-list__item">
-            <label class="check-list__label">
-              <input
-              class="check-list__check sr-only" type="checkbox" name="volume" value="8" checked="">
-              <span class="check-list__desc">
-                8
-                <span>(313)</span>
-              </span>
-            </label>
-          </li>
-          <li class="check-list__item">
-            <label class="check-list__label">
-              <input class="check-list__check sr-only" type="checkbox" name="volume" value="16">
-              <span class="check-list__desc">
-                16
-                <span>(461)</span>
-              </span>
-            </label>
-          </li>
-          <li class="check-list__item">
-            <label class="check-list__label">
-              <input class="check-list__check sr-only" type="checkbox" name="volume" value="32">
-              <span class="check-list__desc">
-                32
-                <span>(313)</span>
-              </span>
-            </label>
-          </li>
-          <li class="check-list__item">
-            <label class="check-list__label">
-              <input class="check-list__check sr-only" type="checkbox" name="volume" value="64">
-              <span class="check-list__desc">
-                64
-                <span>(313)</span>
-              </span>
-            </label>
-          </li>
-          <li class="check-list__item">
-            <label class="check-list__label">
-              <input class="check-list__check sr-only" type="checkbox" name="volume" value="128">
-              <span class="check-list__desc">
-                128
-                <span>(313)</span>
-              </span>
-            </label>
-          </li>
-          <li class="check-list__item">
-            <label class="check-list__label">
-              <input class="check-list__check sr-only" type="checkbox" name="volume" value="264">
-              <span class="check-list__desc">
-                264
-                <span>(313)</span>
-              </span>
-            </label>
-          </li>
-        </ul>
-      </fieldset> -->
+          <ProductFilterByMemory
+            :memoryCounter="memoryCounter"
+            :currentMemory="currentMemory"
+            @check="check($event)"
+          />
+      </fieldset>
 
       <!-- Кнопка применить -->
       <button class="filter__submit button button--primery" type="submit">
@@ -156,26 +105,28 @@
 <script>
 import BaseFormText from '@/components/BaseFormText.vue';
 import ProductFilterAllColors from '@/components/filter/ProductFilterAllColors.vue';
+import ProductFilterByMemory from '@/components/filter/ProductFilterByMemory.vue';
 import axios from 'axios';
 import API_BASE_URL from '@/config';
 
 export default {
   name: 'ProductFilter',
-  components: { ProductFilterAllColors, BaseFormText },
+  components: { BaseFormText, ProductFilterAllColors, ProductFilterByMemory },
   data() {
     return {
       currentPriceFrom: 0,
       currentPriceTo: 0,
       currentCategoryId: 0,
-      currentActiveColor: null,
+      currentColor: null,
+      currentMemory: [],
 
-      obj: {},
+      memoryCounter: [],
 
       categoriesData: null,
       colorsData: null,
     };
   },
-  props: ['priceFrom', 'priceTo', 'categoryId', 'activeColor'],
+  props: ['priceFrom', 'priceTo', 'categoryId', 'color', 'memory'],
   computed: {
     categories() {
       return this.categoriesData ? this.categoriesData.items : [];
@@ -191,25 +142,30 @@ export default {
     priceTo(value) {
       this.currentPriceTo = value;
     },
-    priceCategoryId(value) {
+    categoryId(value) {
       this.currentCategoryId = value;
     },
-    activeColor(value) {
-      this.currentActiveColor = value;
+    color(value) {
+      this.currentColor = value;
     },
+    // memory(value) {
+    //   this.currentMemory = value;
+    // },
   },
   methods: {
     submit() {
       this.$emit('update:priceFrom', this.currentPriceFrom);
       this.$emit('update:priceTo', this.currentPriceTo);
       this.$emit('update:categoryId', this.currentCategoryId);
-      this.$emit('update:activeColor', this.currentActiveColor);
+      this.$emit('update:color', this.currentColor);
+      this.$emit('update:memory', this.currentMemory);
     },
     reset() {
       this.$emit('update:priceFrom', 0);
       this.$emit('update:priceTo', 0);
       this.$emit('update:categoryId', 0);
-      this.$emit('update:activeColor', null);
+      this.$emit('update:color', null);
+      this.$emit('update:memory', []);
     },
     // Загружаем список категорий
     loadCategories() {
@@ -225,33 +181,44 @@ export default {
           this.colorsData = response.data;
         });
     },
-    loadMemory() {
-      const memoryArr = ['8GB', '16GB', '32GB', '64GB', '128GB'];
+    loadCounterByMemory() {
+      const memoryArr = [8, 16, 32, 64, 128, 256];
+      const arr = [];
 
-      function getProductsByMemory(memoryValue, param) {
-        axios.get(`${API_BASE_URL}/api/products`, {
-          params: {
-            'props[built_in_memory]': [`${memoryValue}`],
-          },
+      async function fetch(memoryValue) {
+        await axios.get(`${API_BASE_URL}/api/products`, {
+          params: { 'props[built_in_memory]': [`${memoryValue}GB`] },
+        }).then((response) => {
+          arr.push({
+            gb: memoryValue,
+            count: response.data.items.length,
+          });
         });
-        // этот вывод в консоль покажет порядок вызовов
-        console.log(`Запрос на: ${memoryValue} with params: ${param}`);
-        return new Promise((resolve) => { resolve('выполнен'); });
+        return new Promise((resolve) => { resolve(); });
       }
 
+      // Серия последовательных запросов
       function reduceWay(callback) {
         memoryArr.reduce((acc, item) => acc
-          .then((res) => getProductsByMemory(item, res)), Promise.resolve('1й выполнен'))
+          .then((res) => fetch(item, res)), Promise.resolve())
           .then((result) => { callback(result); });
       }
 
-      reduceWay((result) => console.log(`Итог: ${result}`));
+      // Передаем функцию в колбэк на финише
+      reduceWay(() => {
+        this.memoryCounter = arr;
+      });
+    },
+    check(e) {
+      const arr = this.currentMemory;
+      if (!arr.includes(e)) arr.push(e);
+      else arr.splice(arr.findIndex((el) => el === e), 1);
     },
   },
   created() {
     this.loadCategories();
     this.loadColors();
-    this.loadMemory();
+    this.loadCounterByMemory();
   },
 };
 </script>

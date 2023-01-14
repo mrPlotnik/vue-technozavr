@@ -12,7 +12,8 @@
         :price-from.sync="filterPriceFrom"
         :price-to.sync="filterPriceTo"
         :category-id.sync="filterCategoryId"
-        :active-color.sync="activeColor"
+        :color.sync="filterColor"
+        :memory.sync="filterMemory"
       />
 
       <section class="catalog">
@@ -68,11 +69,10 @@
 </template>
 
 <script>
-import ProductFilter from '@/components/filter/ProductFilter.vue';
-
 import PreLoader from '@/components/PreLoader.vue';
-import BasePagination from '@/components/BasePagination.vue';
+import ProductFilter from '@/components/filter/ProductFilter.vue';
 import ProductList from '@/components/product/ProductList.vue';
+import BasePagination from '@/components/BasePagination.vue';
 import axios from 'axios';
 import API_BASE_URL from '../config';
 
@@ -89,7 +89,8 @@ export default {
       filterPriceFrom: 0,
       filterPriceTo: 0,
       filterCategoryId: 0,
-      activeColor: null,
+      filterColor: null,
+      filterMemory: [],
 
       page: 1,
       productsPerPage: 12,
@@ -128,7 +129,16 @@ export default {
       if (this.filterPriceFrom) params.minPrice = this.filterPriceFrom;
       if (this.filterPriceTo) params.maxPrice = this.filterPriceTo;
       if (this.filterCategoryId) params.categoryId = this.filterCategoryId;
-      if (this.activeColor) params.colorId = this.activeColor;
+
+      let str = '';
+      if (this.filterMemory.length !== 0) {
+        this.filterMemory.forEach((el, i) => {
+          str += `props[built_in_memory][]=${el}GB`;
+          if (i < this.filterMemory.length - 1) str += '&';
+        });
+      }
+
+      console.log(params);
 
       // Очищаем таймер
       clearTimeout(this.loadProductsTimer);
@@ -138,7 +148,7 @@ export default {
       // там храним идент-р таймера.
       this.loadProductsTimer = setTimeout(() => {
         axios
-          .get(`${API_BASE_URL}/api/products`, {
+          .get(`${API_BASE_URL}/api/products?${str}`, {
             // Параметры, которые будут передаваться в query-string
             // Берем их из свойств состояния
             params: {
@@ -162,29 +172,6 @@ export default {
           });
       }, 0);
     },
-    // reduceWay(urls) {
-    //   const arr = [];
-
-    //   async function fakeFetch(url) {
-    //     const qwe = await fetch(url);
-    //     const asd = await qwe.json();
-    //     arr.push(asd.id);
-
-    //     // этот вывод в консоль покажет порядок вызовов
-    //     console.log(arr);
-    //     console.log(`fakeFetch to: ${url}`);
-
-    //     return new Promise((resolve) => { resolve('is DONE'); });
-    //   }
-
-    //   function reduceWayF(callback) {
-    //     urls.reduce((acc, item) => acc
-    //       .then((res) => fakeFetch(item, res)), Promise.resolve())
-    //       .then((result) => callback(result));
-    //   }
-
-    //   reduceWayF((result) => console.log(`result: ${result}`));
-    // },
   },
   // Следим за свойствоми состояния
   watch: {
@@ -206,9 +193,12 @@ export default {
     filterPriceTo() {
       this.loadProducts();
     },
-    activeColor() {
+    filterColor() {
       this.loadProducts();
     },
+    // filterMemory() {
+    //   this.loadProducts();
+    // },
   },
   // В хуке
   created() {
