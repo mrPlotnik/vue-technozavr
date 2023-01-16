@@ -22,6 +22,8 @@
       :parentIndex = parentIndex
       :offerValue="offerValue"
       :activeOffer="activeOffer"
+      :mainProp="mainProp"
+      :colorCode="colorCode"
       @check="activeOffer = $event"
     />
 
@@ -40,14 +42,20 @@ export default {
   data() {
     return {
       activeOffer: 0,
-      activeColorCode: this.product.colors[0].code,
     };
   },
   filters: { numberFormat },
   computed: {
+    // Всего офферов
     offers() {
       return this.product.offers;
     },
+    // Главное свойство товара
+    mainProp() {
+      return this.product.mainProp.id;
+    },
+    // Значения офферов
+    // Для телефонов память, для самокатов цвет и т.д.
     offerValue() {
       const arr = [];
       this.offers.forEach((el) => {
@@ -58,12 +66,43 @@ export default {
       });
       return arr;
     },
+    // Цена для астивноего оффера
     price() {
       return this.offers[this.activeOffer].price;
+    },
+    // Цветовой код оффера
+    colorCode() {
+      // Пляски с бубном, потому что API кривое...
+      // Только для категории самокатов (потому что у них цвет - осн. характеристика)
+      if (this.mainProp === 7) {
+        // Массив. Только название цвета и код цвета
+        const arr = [];
+        this.product.colors.forEach((el) => {
+          // Меняем все ё на е
+          const title = this.replaceSimbols('ё', 'е', el.color.title);
+          arr.push({ title, code: el.color.code });
+        });
+
+        // Если название цветов совпадает - тогда берем код
+        const newArr = [];
+        this.offerValue.forEach((el) => {
+          const index = arr.findIndex((n) => {
+            const title = this.replaceSimbols('ё', 'е', n.title);
+            return title === el;
+          });
+          newArr.push(arr[index].code);
+        });
+        return newArr;
+      } return null;
+    // На самом деле этоот лишний код нужен лишь для одной единицы товара - самоката с id:6
+    // Либо я не понял замысел разработчика API
     },
   },
   methods: {
     gotoPage,
+    replaceSimbols(a, b, str) {
+      return str.replace(RegExp(`${a}`, 'gi'), `${b}`);
+    },
   },
 };
 </script>

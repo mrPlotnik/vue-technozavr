@@ -1,5 +1,22 @@
 <template>
-  <ul class="sizes">
+
+  <ul class="colors colors--black" v-if="mainProp === 7">
+    <li class="colors__item" v-for="(offer, i) in offerValue" :key="i">
+      <label class="colors__label" :for="`list-${parentIndex}-input-${i}`">
+        <input
+          class="colors__radio sr-only"
+          :id="`list-${parentIndex}-input-${i}`"
+          type="radio"
+          :value="i"
+          :checked="activeOffer === i"
+          @click="$emit('check', i)"
+        >
+        <span class="colors__value checkedItem" :style="{backgroundColor: colorCode[i]}"></span>
+      </label>
+    </li>
+  </ul>
+
+  <ul class="sizes" v-else>
     <li class="sizes__item" v-for="(offer, i) in offerValue" :key="i">
       <label class="sizes__label" :for="`list-${parentIndex}-input-${i}`">
         <input
@@ -14,12 +31,13 @@
       </label>
     </li>
   </ul>
+
 </template>
 
 <script>
 export default {
-  name: 'ProdeuctBtns',
-  props: ['parentIndex', 'activeOffer', 'offerValue'],
+  name: 'ProductBtns',
+  props: ['parentIndex', 'activeOffer', 'offerValue', 'mainProp', 'colorCode'],
 };
 </script>
 

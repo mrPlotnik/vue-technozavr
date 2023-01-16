@@ -14,6 +14,8 @@
         :category-id.sync="filterCategoryId"
         :color.sync="filterColor"
         :memory.sync="filterMemory"
+        @loadProductsByFilters="loadProducts"
+        @resetFilters="resetFilters"
       />
 
       <section class="catalog">
@@ -69,11 +71,11 @@
 </template>
 
 <script>
+import axios from 'axios';
 import PreLoader from '@/components/PreLoader.vue';
 import ProductFilter from '@/components/filter/ProductFilter.vue';
 import ProductList from '@/components/product/ProductList.vue';
 import BasePagination from '@/components/BasePagination.vue';
-import axios from 'axios';
 import API_BASE_URL from '../config';
 
 export default {
@@ -88,7 +90,7 @@ export default {
 
       filterPriceFrom: 0,
       filterPriceTo: 0,
-      filterCategoryId: 0,
+      filterCategoryId: null,
       filterColor: null,
       filterMemory: [],
 
@@ -137,6 +139,9 @@ export default {
           if (i < this.filterMemory.length - 1) str += '&';
         });
       }
+      if (this.filterColor) {
+        str += `props[color][]=${this.filterColor}`;
+      }
 
       console.log(params);
 
@@ -172,8 +177,15 @@ export default {
           });
       }, 0);
     },
+    resetFilters() {
+      this.filterPriceFrom = 0;
+      this.filterPriceTo = 0;
+      this.filterCategoryId = 0;
+      this.filterColor = null;
+      this.filterMemory = [];
+      this.loadProducts();
+    },
   },
-  // Следим за свойствоми состояния
   watch: {
     // При кликах по пагинации
     page() {
@@ -184,25 +196,23 @@ export default {
       this.loadProducts();
     },
     // Свойства фильтрации
-    filterCategoryId() {
-      this.loadProducts();
-    },
-    filterPriceFrom() {
-      this.loadProducts();
-    },
-    filterPriceTo() {
-      this.loadProducts();
-    },
-    filterColor() {
-      this.loadProducts();
-    },
+    // filterCategoryId() {
+    //   this.loadProducts();
+    // },
+    // filterPriceFrom() {
+    //   this.loadProducts();
+    // },
+    // filterPriceTo() {
+    //   this.loadProducts();
+    // },
+    // filterColor() {
+    //   this.loadProducts();
+    // },
     // filterMemory() {
     //   this.loadProducts();
     // },
   },
-  // В хуке
   created() {
-    // выполняем метод
     this.loadProducts();
   },
 

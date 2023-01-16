@@ -45,6 +45,7 @@
             type="text"
             name="category"
             v-model.number="currentCategoryId"
+            @input="filterByCategoryClick($event.target.value)"
           >
             <option value="0">Все категории</option>
             <option
@@ -58,29 +59,54 @@
         </label>
       </fieldset>
 
-      <!-- Цвет -->
-      <fieldset class="form__block">
+      <!-- Фильтр по цветам -->
+      <fieldset class="form__block" v-show="categoryId === 4">
         <legend class="form__legend">Цвет</legend>
         <ul class="colors">
-          <ProductFilterAllColors
+          <li
+            class="colors__item"
             v-for="color in colors"
             :key="color.id"
-            :color="color"
-            :activeColor="currentColor"
-            @input="currentColor = $event"
-          />
+          >
+            <label class="colors__label" :for="`color-filter-${color.id}`">
+            <input
+              :id="`color-filter-${color.id}`"
+              class="colors__radio sr-only"
+              type="radio"
+              :value="color.id"
+              @input="filterByColorClick(color.title)"
+              v-model="currentColor"
+            >
+            <span class="colors__value" :style="{'background-color': color.code}"></span>
+            </label>
+          </li>
         </ul>
       </fieldset>
 
-      <!--  -->
-
-      <fieldset class="form__block">
+      <!-- Фильтр по памяти -->
+      <fieldset class="form__block" v-show="categoryId === 1">
         <legend class="form__legend">Объемб в ГБ</legend>
-          <ProductFilterByMemory
-            :memoryCounter="memoryCounter"
-            :currentMemory="currentMemory"
-            @check="check($event)"
-          />
+        <ul class="check-list">
+
+          <li class="check-list__item" v-for="(elem, index) in memoryCounter" :key="index">
+            <label class="check-list__label" :for="`check-list-${elem.gb}`">
+              <input
+                :id="`check-list-${elem.gb}`"
+                class="check-list__check sr-only"
+                type="checkbox"
+                name="volume"
+                :value="elem.gb"
+                @input="filterByMemoryClick(elem.gb)"
+                v-model="currentMemory"
+              >
+              <span class="check-list__desc">
+                {{ elem.gb }}GB
+                <span>({{ elem.count }})</span>
+              </span>
+            </label>
+          </li>
+
+        </ul>
       </fieldset>
 
       <!-- Кнопка применить -->
@@ -104,14 +130,12 @@
 
 <script>
 import BaseFormText from '@/components/BaseFormText.vue';
-import ProductFilterAllColors from '@/components/filter/ProductFilterAllColors.vue';
-import ProductFilterByMemory from '@/components/filter/ProductFilterByMemory.vue';
 import axios from 'axios';
 import API_BASE_URL from '@/config';
 
 export default {
   name: 'ProductFilter',
-  components: { BaseFormText, ProductFilterAllColors, ProductFilterByMemory },
+  components: { BaseFormText },
   data() {
     return {
       currentPriceFrom: 0,
@@ -136,6 +160,8 @@ export default {
     },
   },
   watch: {
+    // Например после ресета, галочки не убирались.
+    // Обновляем данные
     priceFrom(value) {
       this.currentPriceFrom = value;
     },
@@ -148,24 +174,16 @@ export default {
     color(value) {
       this.currentColor = value;
     },
-    // memory(value) {
-    //   this.currentMemory = value;
-    // },
+    memory(value) {
+      this.currentMemory = value;
+    },
   },
   methods: {
     submit() {
-      this.$emit('update:priceFrom', this.currentPriceFrom);
-      this.$emit('update:priceTo', this.currentPriceTo);
-      this.$emit('update:categoryId', this.currentCategoryId);
-      this.$emit('update:color', this.currentColor);
-      this.$emit('update:memory', this.currentMemory);
+      this.$emit('loadProductsByFilters');
     },
     reset() {
-      this.$emit('update:priceFrom', 0);
-      this.$emit('update:priceTo', 0);
-      this.$emit('update:categoryId', 0);
-      this.$emit('update:color', null);
-      this.$emit('update:memory', []);
+      this.$emit('resetFilters');
     },
     // Загружаем список категорий
     loadCategories() {
@@ -181,6 +199,7 @@ export default {
           this.colorsData = response.data;
         });
     },
+    // Загружаем счетчики товаров по памяти
     loadCounterByMemory() {
       const memoryArr = [8, 16, 32, 64, 128, 256];
       const arr = [];
@@ -209,10 +228,25 @@ export default {
         this.memoryCounter = arr;
       });
     },
-    check(e) {
+    filterByColorClick(e) {
+      this.currentColor = e;
+      // Двусторонняя привязка
+      this.$emit('update:color', this.currentColor);
+    },
+    filterByMemoryClick(e) {
+      // Для удобства
       const arr = this.currentMemory;
+      // Если в массиве нет элемента со значением е, то добавляем его
       if (!arr.includes(e)) arr.push(e);
+      // А если еть, то удаляем
       else arr.splice(arr.findIndex((el) => el === e), 1);
+      // Двусторонняя привязка
+      this.$emit('update:memory', this.currentMemory);
+    },
+    filterByCategoryClick(e) {
+      this.currentCategoryId = Number(e);
+      // Двусторонняя привязка
+      this.$emit('update:categoryId', this.currentCategoryId);
     },
   },
   created() {
