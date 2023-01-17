@@ -12,6 +12,7 @@
         :type="type"
         :placeholder="placeholder"
         v-model="dataValue"
+        @input="$emit('priceFromClick', $event.target.value)"
       >
       <span class="form__value">{{ title }}</span>
     </label>

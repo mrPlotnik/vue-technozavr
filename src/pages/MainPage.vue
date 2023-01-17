@@ -12,8 +12,8 @@
         :price-from.sync="filterPriceFrom"
         :price-to.sync="filterPriceTo"
         :category-id.sync="filterCategoryId"
-        :color.sync="filterColor"
-        :memory.sync="filterMemory"
+        :categoryMainPropSlug.sync='filterCategoryMainPropSlug'
+        :sku.sync="filterSku"
         @loadProductsByFilters="loadProducts"
         @resetFilters="resetFilters"
       />
@@ -90,9 +90,10 @@ export default {
 
       filterPriceFrom: 0,
       filterPriceTo: 0,
-      filterCategoryId: null,
-      filterColor: null,
-      filterMemory: [],
+      filterCategoryId: 0,
+
+      filterCategoryMainPropSlug: '',
+      filterSku: [],
 
       page: 1,
       productsPerPage: 12,
@@ -132,18 +133,17 @@ export default {
       if (this.filterPriceTo) params.maxPrice = this.filterPriceTo;
       if (this.filterCategoryId) params.categoryId = this.filterCategoryId;
 
+      // Формируем строку, которая пойдет в query параметры
       let str = '';
-      if (this.filterMemory.length !== 0) {
-        this.filterMemory.forEach((el, i) => {
-          str += `props[built_in_memory][]=${el}GB`;
-          if (i < this.filterMemory.length - 1) str += '&';
+      // Если массив не пустой
+      if (this.filterSku.length !== 0) {
+        this.filterSku.forEach((el, i) => {
+          str += `props[${this.filterCategoryMainPropSlug}][]=${el}`;
+          // Добавляем амперсанд, если текущий элемент массива не последний
+          // Соответственно в конце последнего элемента - не добавляем
+          if (i < this.filterSku.length - 1) str += '&';
         });
       }
-      if (this.filterColor) {
-        str += `props[color][]=${this.filterColor}`;
-      }
-
-      console.log(params);
 
       // Очищаем таймер
       clearTimeout(this.loadProductsTimer);
@@ -181,8 +181,8 @@ export default {
       this.filterPriceFrom = 0;
       this.filterPriceTo = 0;
       this.filterCategoryId = 0;
-      this.filterColor = null;
-      this.filterMemory = [];
+      this.filterCategoryMainPropSlug = '';
+      this.filterSku = [];
       this.loadProducts();
     },
   },
@@ -203,12 +203,6 @@ export default {
     //   this.loadProducts();
     // },
     // filterPriceTo() {
-    //   this.loadProducts();
-    // },
-    // filterColor() {
-    //   this.loadProducts();
-    // },
-    // filterMemory() {
     //   this.loadProducts();
     // },
   },

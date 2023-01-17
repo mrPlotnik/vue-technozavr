@@ -9,29 +9,36 @@
       @submit.prevent="submit"
     >
 
-      <!-- Цена -->
+      <!-- Цена от -->
       <fieldset class="form__block">
         <legend class="form__legend">Цена</legend>
 
-        <BaseFormText
-          id="filter-from"
-          classParent="form__input-wrap--price"
-          classLabel="form__label form__label--price"
-          classInput="form__input"
-          title="От"
-          type="text"
-          v-model.number="currentPriceFrom"
-        />
+        <div class="form__input-wrap--price">
+          <label class="form__label form__label--price" for="filter-from">
+            <input
+              id="filter-from"
+              class="form__input"
+              type="text"
+              v-model.number="currentPriceFrom"
+              @input="priceFromClick($event.target.value)"
+            >
+            <span class="form__value">От</span>
+          </label>
+        </div>
 
-        <BaseFormText
-          id="filter-to"
-          classParent="form__input-wrap--price"
-          classLabel="form__label form__label--price"
-          classInput="form__input"
-          title="До"
-          type="text"
-          v-model.number="currentPriceTo"
-        />
+        <!-- Цена до -->
+        <div class="form__input-wrap--price">
+          <label class="form__label form__label--price" for="filter-to">
+            <input
+              id="filter-to"
+              class="form__input"
+              type="text"
+              v-model.number="currentPriceTo"
+              @input="priceToClick($event.target.value)"
+            >
+            <span class="form__value">До</span>
+          </label>
+        </div>
 
       </fieldset>
 
@@ -59,53 +66,26 @@
         </label>
       </fieldset>
 
-      <!-- Фильтр по цветам -->
-      <fieldset class="form__block" v-show="categoryId === 4">
-        <legend class="form__legend">Цвет</legend>
-        <ul class="colors">
-          <li
-            class="colors__item"
-            v-for="color in colors"
-            :key="color.id"
-          >
-            <label class="colors__label" :for="`color-filter-${color.id}`">
-            <input
-              :id="`color-filter-${color.id}`"
-              class="colors__radio sr-only"
-              type="radio"
-              :value="color.id"
-              @input="filterByColorClick(color.title)"
-              v-model="currentColor"
-            >
-            <span class="colors__value" :style="{'background-color': color.code}"></span>
-            </label>
-          </li>
-        </ul>
-      </fieldset>
-
-      <!-- Фильтр по памяти -->
-      <fieldset class="form__block" v-show="categoryId === 1">
-        <legend class="form__legend">Объемб в ГБ</legend>
+      <!-- Фильтр по SKU -->
+      <fieldset class="form__block">
+        <legend class="form__legend">{{ currentCategoryMainProp }}</legend>
         <ul class="check-list">
-
-          <li class="check-list__item" v-for="(elem, index) in memoryCounter" :key="index">
-            <label class="check-list__label" :for="`check-list-${elem.gb}`">
+          <li class="check-list__item" v-for="(elem, index) in currentCategoryData" :key="index">
+            <label class="check-list__label" :for="`check-list-${elem.value}`">
               <input
-                :id="`check-list-${elem.gb}`"
+                :id="`check-list-${elem.value}`"
                 class="check-list__check sr-only"
                 type="checkbox"
                 name="volume"
-                :value="elem.gb"
-                @input="filterByMemoryClick(elem.gb)"
-                v-model="currentMemory"
+                :value="elem.value"
+                @input="skuClick(elem.value)"
               >
               <span class="check-list__desc">
-                {{ elem.gb }}GB
-                <span>({{ elem.count }})</span>
+                {{ elem.value }}
+                <span>({{ elem.productsCount }})</span>
               </span>
             </label>
           </li>
-
         </ul>
       </fieldset>
 
@@ -119,6 +99,7 @@
         class="filter__reset button button--second"
         type="button"
         @click.prevent="reset"
+        v-show="categoryId !== 0 || priceTo !== 0 || priceFrom !== 0"
       >
         Сбросить
       </button>
@@ -129,34 +110,30 @@
 </template>
 
 <script>
-import BaseFormText from '@/components/BaseFormText.vue';
 import axios from 'axios';
 import API_BASE_URL from '@/config';
 
 export default {
   name: 'ProductFilter',
-  components: { BaseFormText },
   data() {
     return {
       currentPriceFrom: 0,
       currentPriceTo: 0,
       currentCategoryId: 0,
-      currentColor: null,
-      currentMemory: [],
 
-      memoryCounter: [],
+      currentSku: [],
 
-      categoriesData: null,
-      colorsData: null,
+      currentCategoryMainProp: '',
+      currentCategoryMainPropSlug: '',
+      currentCategoryData: [],
+
+      categoriesData: [],
     };
   },
-  props: ['priceFrom', 'priceTo', 'categoryId', 'color', 'memory'],
+  props: ['priceFrom', 'priceTo', 'categoryId', 'categoryMainPropSlug', 'sku'],
   computed: {
     categories() {
       return this.categoriesData ? this.categoriesData.items : [];
-    },
-    colors() {
-      return this.colorsData ? this.colorsData.items : [];
     },
   },
   watch: {
@@ -170,12 +147,13 @@ export default {
     },
     categoryId(value) {
       this.currentCategoryId = value;
+      if (value !== 0) this.loadCategoryIdData(value);
     },
-    color(value) {
-      this.currentColor = value;
+    categoryMainPropSlug(value) {
+      this.currentCategoryMainPropSlug = value;
     },
-    memory(value) {
-      this.currentMemory = value;
+    sku(value) {
+      this.currentSku = value;
     },
   },
   methods: {
@@ -184,6 +162,9 @@ export default {
     },
     reset() {
       this.$emit('resetFilters');
+      this.currentCategoryMainProp = '';
+      this.currentCategoryMainPropSlug = '';
+      this.currentCategoryData = [];
     },
     // Загружаем список категорий
     loadCategories() {
@@ -192,67 +173,42 @@ export default {
           this.categoriesData = response.data;
         });
     },
-    // Загружаем список цветов
-    loadColors() {
-      axios.get(`${API_BASE_URL}/api/colors`)
+    // Загружаем SKU данные
+    loadCategoryIdData(id) {
+      axios.get(`${API_BASE_URL}/api/productCategories/${id}`)
         .then((response) => {
-          this.colorsData = response.data;
+          this.currentCategoryData = response.data.productProps[0].availableValues;
+          this.currentCategoryMainProp = response.data.productProps[0].title;
+          // Двусторонняя привязка
+          this.$emit('update:categoryMainPropSlug', response.data.productProps[0].code);
         });
     },
-    // Загружаем счетчики товаров по памяти
-    loadCounterByMemory() {
-      const memoryArr = [8, 16, 32, 64, 128, 256];
-      const arr = [];
-
-      async function fetch(memoryValue) {
-        await axios.get(`${API_BASE_URL}/api/products`, {
-          params: { 'props[built_in_memory]': [`${memoryValue}GB`] },
-        }).then((response) => {
-          arr.push({
-            gb: memoryValue,
-            count: response.data.items.length,
-          });
-        });
-        return new Promise((resolve) => { resolve(); });
-      }
-
-      // Серия последовательных запросов
-      function reduceWay(callback) {
-        memoryArr.reduce((acc, item) => acc
-          .then((res) => fetch(item, res)), Promise.resolve())
-          .then((result) => { callback(result); });
-      }
-
-      // Передаем функцию в колбэк на финише
-      reduceWay(() => {
-        this.memoryCounter = arr;
-      });
+    // Поведение при выборе категории
+    filterByCategoryClick(e) {
+      this.$emit('update:categoryId', Number(e));
     },
-    filterByColorClick(e) {
-      this.currentColor = e;
-      // Двусторонняя привязка
-      this.$emit('update:color', this.currentColor);
-    },
-    filterByMemoryClick(e) {
+    // Поведение при кликах на фильтрах SKU
+    skuClick(e) {
       // Для удобства
-      const arr = this.currentMemory;
+      const arr = this.currentSku;
       // Если в массиве нет элемента со значением е, то добавляем его
       if (!arr.includes(e)) arr.push(e);
       // А если еть, то удаляем
       else arr.splice(arr.findIndex((el) => el === e), 1);
       // Двусторонняя привязка
-      this.$emit('update:memory', this.currentMemory);
+      this.$emit('update:sku', this.currentSku);
     },
-    filterByCategoryClick(e) {
-      this.currentCategoryId = Number(e);
-      // Двусторонняя привязка
-      this.$emit('update:categoryId', this.currentCategoryId);
+    // Поведение при вводе цены от
+    priceFromClick(e) {
+      this.$emit('update:priceFrom', Number(e));
+    },
+    // Поведение при вводе цены до
+    priceToClick(e) {
+      this.$emit('update:priceTo', Number(e));
     },
   },
   created() {
     this.loadCategories();
-    this.loadColors();
-    this.loadCounterByMemory();
   },
 };
 </script>
