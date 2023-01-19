@@ -65,13 +65,15 @@ export default new Vuex.Store({
     updateCartProductsData(state, items) {
       state.cartProductsData = items;
     },
-    // Обновляем данные корзины (только id и quantity)
+    // Обновляем данные корзины
     // Вызывается из
-    // actions.loadCart()
+    // actions.loadCart() и addProductToCart
     syncCartProducts(state) {
       // Оставляем только id и quantity
       state.cartProducts = state.cartProductsData.map((item) => ({
-        id: item.product.id,
+        offerId: item.productOffer.id,
+        offerTitle: item.productOffer.title,
+        colorId: item.color.color.id,
         quantity: item.quantity,
       }));
     },
@@ -105,16 +107,17 @@ export default new Vuex.Store({
             // и в state
             context.commit('updateUserAccessKey', response.data.user.accessKey);
           }
-          // обновляем в state список товаров в корзине (полное описание товаров)
+          // обновляем в state список товаров в корзине (все данные о товарах)
           context.commit('updateCartProductsData', response.data.items);
           // обновляем в state список товаров в корзине (только id и quantity)
           context.commit('syncCartProducts');
         });
     },
-    addProductToCart(context, { productId, quantity }) {
+    addProductToCart(context, { productOfferId, colorId, quantity }) {
       return axios
         .post(`${API_BASE_URL}/api/baskets/products`, {
-          productId,
+          productOfferId,
+          colorId,
           quantity,
         }, {
           params: {

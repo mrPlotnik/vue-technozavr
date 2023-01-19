@@ -1,23 +1,20 @@
 <template>
   <PreLoader v-if="productsLoading"/>
+
   <main class="content container" v-else-if="productsLoadingFailed">Что-то пошло не так</main>
+
   <main class="content container" v-else>
+
     <div class="content__top">
       <ul class="breadcrumbs">
         <li class="breadcrumbs__item">
-          <router-link
-            class="breadcrumbs__link"
-            :to="{name: 'main'}"
-          >
+          <router-link class="breadcrumbs__link" :to="{name: 'main'}">
             Каталог
           </router-link>
         </li>
         <li class="breadcrumbs__item">
-          <router-link
-            class="breadcrumbs__link"
-            :to="{name: 'main'}"
-          >
-            {{ category.title}}
+          <router-link class="breadcrumbs__link" :to="{name: 'main'}">
+            {{ category.title }}
           </router-link>
         </li>
         <li class="breadcrumbs__item">
@@ -27,6 +24,7 @@
         </li>
       </ul>
     </div>
+
     <section class="item">
       <div class="item__pics pics">
         <div class="pics__wrapper">
@@ -41,77 +39,61 @@
 
       <div class="item__info">
         <span class="item__code">Артикул: {{ product.id }}</span>
-        <h2 class="item__title">
-          {{ product.title }}
-        </h2>
+        <h2 class="item__title"> {{ activeOfferTitle }}</h2>
         <div class="item__form">
 
-          <form
-            class="form"
-            action="#"
-            method="POST"
-            @submit.prevent="addToCart"
-          >
-            <b class="item__price">
-              {{ product.price | numberFormat }} ₽
-            </b>
+          <!-- Форма -->
+          <form class="form" action="#" method="POST" @submit.prevent="addToCart">
+            <b class="item__price">{{ product.price | numberFormat }} ₽</b>
 
+            <!-- Выбор цвета -->
             <fieldset class="form__block">
               <legend class="form__legend">Цвет:</legend>
               <ul class="colors">
-
-                <ProductColors
-                  v-for="color in colors"
-                  :key="color.id"
-                  :color="color"
-                  :activeColorCode="activeColorCode"
-                  @input="activeColorCode = $event"
-                />
-
+                <li class="colors__item" v-for="color in colors" :key="color.id">
+                  <label class="colors__label" :for="`item-color-${color.id}`">
+                    <input
+                      :id="`item-color-${color.id}`"
+                      class="colors__radio sr-only"
+                      type="radio"
+                      name="color"
+                      :value="color.id"
+                      v-model="activeColorCode"
+                    >
+                    <span class="colors__value" :style="{'background-color': color.code}"></span>
+                  </label>
+                </li>
               </ul>
             </fieldset>
 
-            <!-- <fieldset class="form__block">
-              <legend class="form__legend">Объемб в ГБ:</legend>
-
+            <!-- Выбор оффера -->
+            <fieldset class="form__block">
+              <legend class="form__legend">{{ mainPropTitle }}</legend>
               <ul class="sizes sizes--primery">
-                <li class="sizes__item">
-                  <label class="sizes__label" for="qwe1">
-                    <input id="qwe1" class="sizes__radio sr-only" type="radio"
-                      name="sizes-item" value="32">
-                    <span class="sizes__value">
-                      32gb
-                    </span>
-                  </label>
-                </li>
-                <li class="sizes__item">
-                  <label class="sizes__label" for="qwe1">
-                    <input id="qwe1" class="sizes__radio sr-only" type="radio"
-                      name="sizes-item" value="64">
-                    <span class="sizes__value">
-                      64gb
-                    </span>
-                  </label>
-                </li>
-                <li class="sizes__item">
-                  <label class="sizes__label" for="qwe1">
-                    <input id="qwe1" class="sizes__radio sr-only" type="radio"
-                      name="sizes-item" value="128" checked="">
-                    <span class="sizes__value">
-                      128gb
-                    </span>
+                <li class="sizes__item" v-for="(offer, i) in offersData" :key="i">
+                  <label class="sizes__label" :for="`item-offer-${i}`">
+                    <input
+                      :id="`item-offer-${i}`"
+                      class="sizes__radio sr-only"
+                      type="radio"
+                      name="item"
+                      :value="offer.id"
+                      v-model="activeOfferId"
+                    >
+                    <span class="sizes__value">{{ offer.value }}</span>
                   </label>
                 </li>
               </ul>
-            </fieldset> -->
+            </fieldset>
 
+            <!-- Количество товара и кнопка "В корзину" -->
             <div class="item__row">
               <div class="form__counter">
 
                 <button
                   type="button"
                   aria-label="Убрать один товар"
-                  @click.prevent="decrement"
+                  @click.prevent="productAmount = xCrement(productAmount, false)"
                 >
                   <svg width="12" height="12" fill="currentColor">
                     <use xlink:href="#icon-minus"></use>
@@ -131,7 +113,7 @@
                 <button
                   type="button"
                   aria-label="Добавить один товар"
-                  @click.prevent="productAmount += 1"
+                  @click.prevent="productAmount = xCrement(productAmount, true)"
                 >
                   <svg width="12" height="12" fill="currentColor">
                     <use xlink:href="#icon-plus"></use>
@@ -229,25 +211,27 @@
 
 <script>
 import PreLoader from '@/components/PreLoader.vue';
-import ProductColors from '@/components/product/ProductColors.vue';
 import gotoPage from '@/helpers/gotoPage';
 import numberFormat from '@/helpers/numberFormat';
 import axios from 'axios';
 import { mapActions } from 'vuex';
+import xCrement from '@/helpers/xCrement';
 import API_BASE_URL from '../config';
 
 export default {
   name: 'ProductPage',
-  components: { PreLoader, ProductColors },
+  components: { PreLoader },
   data() {
     return {
       productAmount: 1,
-      productData: null,
+      productData: [],
       productsLoading: true,
       productsLoadingFailed: false,
       productAdded: false,
       productAddSending: false,
-      activeColorCode: null,
+      activeColorCode: '',
+      activeOfferId: '',
+      offerTitleDefault: '',
     };
   },
   filters: {
@@ -255,31 +239,80 @@ export default {
   },
   computed: {
     product() {
-      return { ...this.productData, image: this.productData.image.file.url };
+      return { ...this.productData, image: this.productData.preview.file.url };
     },
     category() {
       return this.productData.category;
     },
+    offersData() {
+      const arr = [];
+      this.productData.offers.forEach((el) => {
+        el.propValues.forEach((elem) => {
+          const obj = {};
+          obj.value = elem.value;
+          obj.title = el.title;
+          obj.id = el.id;
+          arr.push(obj);
+        });
+      });
+      return arr;
+    },
     colors() {
-      return this.productData.colors;
+      const arr = [];
+
+      // Этот кусок дублируется
+      if (this.category.id === 4) {
+        this.productData.colors.forEach((el) => {
+          // Меняем все ё на е
+          const title = this.replaceSimbols('ё', 'е', el.color.title);
+          arr.push({ title, code: el.color.code });
+        });
+
+        const newArr = [];
+        this.offersData.forEach((el) => {
+          const index = arr.findIndex((n) => {
+            const title = this.replaceSimbols('ё', 'е', n.title);
+            return title === el;
+          });
+          newArr.push({ title: arr[index].title, code: arr[index].code });
+        });
+        return newArr;
+      }
+      this.productData.colors.forEach((el) => {
+        arr.push({ title: el.color.title, code: el.color.code, id: el.color.id });
+      });
+      return arr;
+    },
+    // Название главного свойства товара
+    mainPropTitle() {
+      return this.product.mainProp.title;
+    },
+    // Название активного оффера
+    activeOfferTitle() {
+      return this.activeOfferId !== ''
+        ? this.offersData.find((e) => e.id === this.activeOfferId).title
+        : this.offerTitleDefault;
     },
   },
   methods: {
     ...mapActions(['addProductToCart']),
     gotoPage,
+    xCrement,
     addToCart() {
       this.productAdded = false;
       this.productAddSending = true;
-      this.addProductToCart({ productId: this.product.id, quantity: this.productAmount })
+      if (this.activeColorCode === '') {
+        console.log('А цвет?');
+      }
+      this.addProductToCart({
+        productOfferId: this.activeOfferId,
+        colorId: this.activeColorCode,
+        quantity: this.productAmount,
+      })
         .then(() => {
           this.productAdded = true;
           this.productAddSending = false;
         });
-    },
-    decrement() {
-      if (this.productAmount > 1) {
-        this.productAmount -= 1;
-      }
     },
     loadProducts() {
       this.productsLoading = true;
@@ -287,7 +320,7 @@ export default {
       axios(`${API_BASE_URL}/api/products/${this.$route.params.id}`)
         .then((response) => {
           this.productData = response.data;
-          this.activeColorCode = this.productData.colors[0].code;
+          this.offerTitleDefault = response.data.title;
         })
         .catch(() => {
           this.productsLoadingFailed = true;
@@ -295,6 +328,9 @@ export default {
         .then(() => {
           this.productsLoading = false;
         });
+    },
+    replaceSimbols(a, b, str) {
+      return str.replace(RegExp(`${a}`, 'gi'), `${b}`);
     },
   },
   created() {
