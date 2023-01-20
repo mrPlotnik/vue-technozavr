@@ -16,23 +16,24 @@ export default new Vuex.Store({
     orderInfo(state) {
       return state.orderInfo;
     },
-    cartDetailProducts(state) {
+    cartProductsDetail(state) {
       return state.cartProducts.map((item) => {
-        const { product } = state.cartProductsData.find((p) => p.product.id === item.id);
+        const product = state.cartProductsData
+          .find((p) => p.productOffer.id === item.offerId);
         return {
           ...item,
           product: {
             ...product,
-            image: product.image.file.url,
+            image: product.productOffer.product.preview.file.url,
           },
         };
       });
     },
     cartTotalPrice(state, getters) {
-      return getters.cartDetailProducts.reduce((p, i) => (i.product.price * i.quantity) + p, 0);
+      return getters.cartProductsDetail.reduce((p, i) => (i.product.price * i.quantity) + p, 0);
     },
     cartTotalProducts(state, getters) {
-      return (getters.cartDetailProducts.reduce((p, i) => Number(i.quantity) + p, 0));
+      return (getters.cartProductsDetail.reduce((p, i) => Number(i.quantity) + p, 0));
     },
   },
   mutations: {

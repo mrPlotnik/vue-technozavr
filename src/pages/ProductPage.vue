@@ -47,7 +47,7 @@
             <b class="item__price">{{ product.price | numberFormat }} ₽</b>
 
             <!-- Выбор цвета -->
-            <fieldset class="form__block">
+            <fieldset class="form__block" v-show="category.id !== 4">
               <legend class="form__legend">Цвет:</legend>
               <ul class="colors">
                 <li class="colors__item" v-for="color in colors" :key="color.id">
@@ -130,10 +130,12 @@
                 В корзину
               </button>
 
-              <div v-show="productAdded">Товар добавлен в корзину</div>
-              <div v-show="productAddSending">Добавляем товар в корзину...</div>
-
             </div>
+
+            <div class="message" v-show="productAdded">Товар добавлен в корзину</div>
+            <div class="message" v-show="productAddSending">Добавляем товар в корзину...</div>
+            <div class="message message--error" v-show="!formValid">{{ message }}</div>
+
           </form>
         </div>
       </div>
@@ -232,6 +234,7 @@ export default {
       activeColorCode: '',
       activeOfferId: '',
       offerTitleDefault: '',
+      message: '',
     };
   },
   filters: {
@@ -272,7 +275,7 @@ export default {
         this.offersData.forEach((el) => {
           const index = arr.findIndex((n) => {
             const title = this.replaceSimbols('ё', 'е', n.title);
-            return title === el;
+            return title === el.value;
           });
           newArr.push({ title: arr[index].title, code: arr[index].code });
         });
@@ -293,17 +296,32 @@ export default {
         ? this.offersData.find((e) => e.id === this.activeOfferId).title
         : this.offerTitleDefault;
     },
+    formValid() {
+      if (this.category.id !== 4) {
+        return !(this.activeColorCode === '' || this.activeOfferId === '');
+      }
+
+      return this.activeOfferId !== '';
+    },
   },
   methods: {
     ...mapActions(['addProductToCart']),
     gotoPage,
     xCrement,
     addToCart() {
+      this.message = '';
+      if (this.category.id !== 4) {
+        if (this.activeColorCode === '') {
+          this.message += 'Выберите Цвет';
+          return;
+        }
+      }
+      if (this.activeOfferId === '') {
+        this.message = `Выберите ${this.mainPropTitle.toLowerCase()}`;
+        return;
+      }
       this.productAdded = false;
       this.productAddSending = true;
-      if (this.activeColorCode === '') {
-        console.log('А цвет?');
-      }
       this.addProductToCart({
         productOfferId: this.activeOfferId,
         colorId: this.activeColorCode,
@@ -346,3 +364,9 @@ export default {
   },
 };
 </script>
+<style scoped lang="sass">
+.message
+  padding: 5px 0
+.message--error
+  color: red
+</style>
