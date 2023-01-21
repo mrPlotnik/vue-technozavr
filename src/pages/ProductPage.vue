@@ -47,7 +47,7 @@
             <b class="item__price">{{ product.price | numberFormat }} ₽</b>
 
             <!-- Выбор цвета -->
-            <fieldset class="form__block" v-show="category.id !== 4">
+            <fieldset class="form__block">
               <legend class="form__legend">Цвет:</legend>
               <ul class="colors">
                 <li class="colors__item" v-for="color in colors" :key="color.id">
@@ -67,7 +67,7 @@
             </fieldset>
 
             <!-- Выбор оффера -->
-            <fieldset class="form__block">
+            <fieldset class="form__block" v-show="category.id !== 4">
               <legend class="form__legend">{{ mainPropTitle }}</legend>
               <ul class="sizes sizes--primery">
                 <li class="sizes__item" v-for="(offer, i) in offersData" :key="i">
@@ -249,40 +249,45 @@ export default {
     },
     offersData() {
       const arr = [];
-      this.productData.offers.forEach((el) => {
-        el.propValues.forEach((elem) => {
+      this.productData.offers.forEach((e) => {
+        e.propValues.forEach((elem) => {
           const obj = {};
           obj.value = elem.value;
-          obj.title = el.title;
-          obj.id = el.id;
+          obj.title = this.replaceSimbols('ё', 'е', e.title);
+          obj.id = e.id;
           arr.push(obj);
         });
       });
+
+      if (this.category.id === 4) {
+        arr.forEach((el, i) => {
+          const colorInfo = this.productData.colors
+            .find((elem) => {
+              const colorTitle = this.replaceSimbols('ё', 'е', elem.color.title);
+              const colorOfferValue = this.replaceSimbols('ё', 'е', el.value);
+              return colorTitle === colorOfferValue;
+            });
+          arr[i].colorInfo = colorInfo.color;
+        });
+      }
       return arr;
     },
     colors() {
       const arr = [];
 
-      // Этот кусок дублируется
       if (this.category.id === 4) {
-        this.productData.colors.forEach((el) => {
-          // Меняем все ё на е
-          const title = this.replaceSimbols('ё', 'е', el.color.title);
-          arr.push({ title, code: el.color.code });
+        this.offersData.forEach((e) => {
+          arr.push(e.colorInfo);
         });
-
-        const newArr = [];
-        this.offersData.forEach((el) => {
-          const index = arr.findIndex((n) => {
-            const title = this.replaceSimbols('ё', 'е', n.title);
-            return title === el.value;
-          });
-          newArr.push({ title: arr[index].title, code: arr[index].code });
-        });
-        return newArr;
+        return arr;
       }
+
       this.productData.colors.forEach((el) => {
-        arr.push({ title: el.color.title, code: el.color.code, id: el.color.id });
+        arr.push({
+          title: el.color.title,
+          code: el.color.code,
+          id: el.color.id,
+        });
       });
       return arr;
     },
@@ -301,7 +306,7 @@ export default {
         return !(this.activeColorCode === '' || this.activeOfferId === '');
       }
 
-      return this.activeOfferId !== '';
+      return this.activeColorCode !== '';
     },
   },
   methods: {
@@ -310,23 +315,36 @@ export default {
     xCrement,
     addToCart() {
       this.message = '';
+
+      if (this.activeColorCode === '') {
+        this.message += 'Выберите Цвет';
+        return;
+      }
+
+      // У самокатов не выбираем оффер
       if (this.category.id !== 4) {
-        if (this.activeColorCode === '') {
-          this.message += 'Выберите Цвет';
+        if (this.activeOfferId === '') {
+          this.message = `Выберите ${this.mainPropTitle.toLowerCase()}`;
           return;
         }
       }
-      if (this.activeOfferId === '') {
-        this.message = `Выберите ${this.mainPropTitle.toLowerCase()}`;
-        return;
-      }
+
       this.productAdded = false;
       this.productAddSending = true;
-      this.addProductToCart({
-        productOfferId: this.activeOfferId,
-        colorId: this.activeColorCode,
-        quantity: this.productAmount,
-      })
+
+      const paramObj = {};
+
+      if (this.category.id === 4) {
+        paramObj.productOfferId = this.offersData
+          .find((e) => e.colorInfo.id === this.activeColorCode).id;
+      } else {
+        paramObj.productOfferId = this.activeOfferId;
+      }
+
+      paramObj.colorId = this.activeColorCode;
+      paramObj.quantity = this.productAmount;
+
+      this.addProductToCart({ ...paramObj })
         .then(() => {
           this.productAdded = true;
           this.productAddSending = false;
@@ -351,14 +369,15 @@ export default {
       return str.replace(RegExp(`${a}`, 'gi'), `${b}`);
     },
   },
-  created() {
-    this.loadProducts();
-  },
+  // created() {
+  //   this.loadProducts();
+  // },
   watch: {
     '$route.params.id': {
       handler() {
         this.loadProducts();
       },
+      // коллбэк будет вызван сразу же после начала наблюдения
       immediate: true,
     },
   },
@@ -369,4 +388,6 @@ export default {
   padding: 5px 0
 .message--error
   color: red
+.img
+  height: unset
 </style>
