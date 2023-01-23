@@ -300,7 +300,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(['addProductToCart']),
+    ...mapActions(['addProductToBasket']),
     gotoPage,
     xCrement,
     addToCart() {
@@ -334,7 +334,7 @@ export default {
       paramObj.colorId = this.activeColorCode;
       paramObj.quantity = this.productAmount;
 
-      this.addProductToCart({ ...paramObj })
+      this.addProductToBasket({ ...paramObj })
         .then(() => {
           this.productAdded = true;
           this.productAddSending = false;
@@ -362,9 +362,6 @@ export default {
       this.activeTab = i;
     },
   },
-  // created() {
-  //   this.loadProducts();
-  // },
   watch: {
     '$route.params.id': {
       handler() {

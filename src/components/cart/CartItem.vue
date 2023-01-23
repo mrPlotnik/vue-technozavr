@@ -1,6 +1,7 @@
 <template>
   <li class="cart__item product">
 
+    <!-- Картинка товара -->
     <div class="product__pic">
       <img
         :src="item.product.image"
@@ -10,16 +11,22 @@
       >
     </div>
 
+    <!-- Название товара -->
     <h3 class="product__title">
       {{ item.product.productOffer.title }}
     </h3>
+
+    <!-- Основное свойство товара -->
     <p class="product__info">
       {{ mainPropTitle }}:&nbsp;<span>{{ propValue }}</span>
     </p>
+
+    <!-- Артикул -->
     <span class="product__code">
       Артикул: {{ item.product.id }}
     </span>
 
+    <!-- Изменение количества товаров -->
     <div class="product__counter form__counter">
       <button
         type="button"
@@ -52,10 +59,12 @@
       </button>
     </div>
 
+    <!-- Цена товара * количество -->
     <b class="product__price">
       {{ quantity * item.product.price | numberFormat }} ₽
     </b>
 
+    <!-- Кнопка удаления товара -->
     <button
       class="product__del button-del"
       type="button"
@@ -82,12 +91,16 @@ export default {
   props: ['item'],
   computed: {
     quantity: {
+      // Взять значение поля
       get() {
         return this.item.quantity;
       },
-      // при изменении поля
+      // При изменении поля
       set(value) {
-        this.$store.dispatch('updateCartProductQuantity', { basketItemId: this.item.product.id, quantity: value });
+        // Передаем в экшн
+        // id позиции в корзине (не id товара(!)), у которого меняется количество едениц в позиции
+        // и новое количество едениц
+        this.$store.dispatch('updateBasketProductQuantity', { basketItemId: this.item.product.id, quantity: value });
       },
     },
     // Название главного свойства товара

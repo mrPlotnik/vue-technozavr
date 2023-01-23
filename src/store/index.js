@@ -43,8 +43,7 @@ export default new Vuex.Store({
   },
   mutations: {
     // Обновляем ключ корзины. Вызывается из
-    // App.vue
-    // actions.loadBasket()
+    // App.vue при загрузке приложения,  actions.loadBasket()
     updateUserAccessKey(state, accessKey) {
       state.userAccessKey = accessKey;
     },
@@ -56,7 +55,7 @@ export default new Vuex.Store({
       state.cartProducts = [];
       state.cartProductsData = [];
     },
-    updateCartProductQuantity(state, { basketItemId, quantity }) {
+    updateBasketProductQuantity(state, { basketItemId, quantity }) {
       const item = state.cartProducts.find((i) => i.basketItemId === basketItemId);
       if (item) {
         item.quantity = quantity;
@@ -65,16 +64,16 @@ export default new Vuex.Store({
     deleteBasketProduct(state, basketItemId) {
       state.cartProducts = state.cartProducts.filter((item) => item.id !== basketItemId);
     },
-    // Обновляем список товаров в корзине (полное описание товаров)
-    // Вызывается из
-    // actions.loadCart()
-    updateCartProductsData(state, items) {
+    // Обновляем список товаров корзины в state (полное описание товаров)
+    // Вызывается из actions.loadCart(), actions.deleteBasketProduct()
+    updateBasketProductsData(state, items) {
       state.cartProductsData = items;
     },
-    // Обновляем данные корзины
+    // Обновляем определенные данные корзины в state
     // Вызывается из
-    // actions.loadCart() и addProductToCart
-    syncCartProducts(state) {
+    // actions.loadCart(), action.addProductToCart(),
+    // action.updateBasketProductQuantity(), actions.deleteBasketProduct()
+    syncBasketProducts(state) {
       state.cartProducts = state.cartProductsData.map((item) => ({
         basketItemId: item.id,
         offerTitle: item.productOffer.title,
@@ -102,10 +101,10 @@ export default new Vuex.Store({
             // и в state
             context.commit('updateUserAccessKey', response.data.user.accessKey);
           }
-          // обновляем в state список товаров в корзине (все данные о товарах)
-          context.commit('updateCartProductsData', response.data.items);
-          // обновляем в state список товаров в корзине
-          context.commit('syncCartProducts');
+          // Обновляем список товаров корзины в state (полное описание товаров)
+          context.commit('updateBasketProductsData', response.data.items);
+          // Обновляем определенные данные корзины в state
+          context.commit('syncBasketProducts');
         });
     },
 
@@ -120,7 +119,7 @@ export default new Vuex.Store({
           context.commit('updateOrderInfo', response.data);
         });
     },
-    addProductToCart(context, { productOfferId, colorId, quantity }) {
+    addProductToBasket(context, { productOfferId, colorId, quantity }) {
       return axios
         .post(`${API_BASE_URL}/api/baskets/products`, {
           productOfferId,
@@ -132,16 +131,18 @@ export default new Vuex.Store({
           },
         })
         .then((response) => {
-          context.commit('updateCartProductsData', response.data.items);
-          context.commit('syncCartProducts');
+          // Обновляем список товаров корзины в state (полное описание товаров)
+          context.commit('updateBasketProductsData', response.data.items);
+          // Обновляем определенные данные корзины в state
+          context.commit('syncBasketProducts');
         });
     },
-    updateCartProductQuantity(context, { basketItemId, quantity }) {
-      context.commit('updateCartProductQuantity', { basketItemId, quantity });
-      if (quantity < 1) {
-        context.commit('syncCartProducts');
-        return null;
-      }
+    // Изменение количества единиц товара в позиции корзины
+    // Вызывается из CartItem.vue
+    updateBasketProductQuantity(context, { basketItemId, quantity }) {
+      // Обновляем данные в state
+      context.commit('updateBasketProductQuantity', { basketItemId, quantity });
+      // Обновляем данные на сервере
       return axios
         .put(`${API_BASE_URL}/api/baskets/products`, {
           basketItemId,
@@ -152,13 +153,15 @@ export default new Vuex.Store({
           },
         })
         .then((response) => {
-          context.commit('updateCartProductsData', response.data.items);
+          // Обновляем список товаров корзины в state (полное описание товаров)
+          context.commit('updateBasketProductsData', response.data.items);
         })
         .catch(() => {
-          // На всякий случай, если будет ошибка (скорее всего сервера)
-          context.commit('syncCartProducts');
+          // Если будет ошибка
         });
     },
+    // Удаление товара из корзины
+    // Вызывается из CartItem.vue
     deleteBasketProduct(context, { basketItemId }) {
       // context.commit('deleteBasketProduct', { basketItemId });
       return axios
@@ -171,10 +174,13 @@ export default new Vuex.Store({
           },
         })
         .then((response) => {
-          context.commit('updateCartProductsData', response.data.items);
-          context.commit('syncCartProducts');
+          // Обновляем список товаров корзины в state (полное описание товаров)
+          context.commit('updateBasketProductsData', response.data.items);
+          // Обновляем определенные данные корзины в state
+          context.commit('syncBasketProducts');
         })
         .catch(() => {
+          // Если будет ошибка
         });
     },
   },
