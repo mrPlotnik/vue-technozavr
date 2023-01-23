@@ -2,6 +2,8 @@
   <main class="content container">
 
     <div class="content__top">
+
+      <!-- Хлебные крошки -->
       <ul class="breadcrumbs">
         <li class="breadcrumbs__item">
           <a class="breadcrumbs__link" href="index.html">
@@ -20,18 +22,24 @@
         </li>
       </ul>
 
+      <!-- Заголовок страницы -->
       <h1 class="content__title">
         Корзина
       </h1>
+
+      <!-- Всего продуктов в корзине -->
       <span class="content__info">
-       {{ totalProducts }} товара
+        {{ totalProducts }} товара
       </span>
+
     </div>
 
     <section class="cart">
 
       <form class="cart__form form" action="#" method="POST" @submit.prevent="order">
+
         <PreLoader v-if="preloader"/>
+
         <div class="cart__field" v-else>
           <div class="cart__data">
             <BaseFormText
@@ -80,7 +88,9 @@
                 :value="input.value"
                 :name="input.name"
                 @change="activeDelivery = $event"
-              />
+              >
+                <b>{{ input.amount }}</b>
+              </OrderInputRadio>
             </ul>
 
             <h3 class="cart__title">Оплата</h3>
@@ -104,10 +114,12 @@
 
         </div>
 
+        <!-- Список товаров -->
         <OrderList
           :products="products"
           :totelPrice="totelPrice"
           :totalProducts="totalProducts"
+          :delivery="delivery"
           :error="formErrorMessage"
         >
           <button class="cart__button button button--primery" type="submit">
@@ -139,7 +151,7 @@ export default {
   data() {
     return {
       preloader: false,
-      activeDelivery: null,
+      activeDelivery: 'courier',
       activePayment: 'card',
       formError: {},
       formErrorMessage: '',
@@ -164,10 +176,10 @@ export default {
       ],
       deliveryInputsRadio: [
         {
-          id: 'delivery-pickup', title: 'Самовывоз <b>бесплатно</b>', name: 'delivery', value: 'pickup',
+          id: 'delivery-pickup', title: 'Самовывоз', name: 'delivery', value: 'pickup', amount: 'бесплатно',
         },
         {
-          id: 'delivery-courier', title: 'Курьером <b>500 ₽</b>', name: 'delivery', value: 'courier',
+          id: 'delivery-courier', title: 'Курьером', name: 'delivery', value: 'courier', amount: '500 ₽',
         },
       ],
       paymentInputsRadio: [
@@ -182,9 +194,9 @@ export default {
   },
   computed: {
     ...mapGetters({
-      products: 'cartDetailProducts',
-      totelPrice: 'cartTotalPrice',
-      totalProducts: 'cartTotalProducts',
+      products: 'basketProductsDetail',
+      totelPrice: 'basketTotalPrice',
+      totalProducts: 'basketTotalProducts',
     }),
     formData() {
       return {
@@ -193,6 +205,11 @@ export default {
         phone: this.inputsText.find((el) => el.name === 'phone').value,
         email: this.inputsText.find((el) => el.name === 'email').value,
       };
+    },
+    delivery() {
+      return this.activeDelivery === 'courier'
+        ? this.deliveryInputsRadio.find((e) => e.value === 'courier').amount
+        : this.deliveryInputsRadio.find((e) => e.value === 'pickup').amount;
     },
   },
   methods: {

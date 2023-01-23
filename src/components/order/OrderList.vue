@@ -12,7 +12,7 @@
       </ul>
 
       <div class="cart__total">
-        <p>Доставка: <b>500 ₽</b></p>
+        <p>Доставка: <b>{{ delivery }}</b></p>
         <p>Итого:
           <b>{{ totalProducts }}</b>
           товара на сумму
@@ -38,7 +38,7 @@ import OrderItem from './OrderItem.vue';
 
 export default {
   name: 'OrderList',
-  props: ['products', 'totelPrice', 'totalProducts', 'error'],
+  props: ['products', 'totelPrice', 'totalProducts', 'delivery', 'error'],
   filters: { numberFormat },
   components: { OrderItem },
   data() {

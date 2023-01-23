@@ -883,7 +883,7 @@ a {
    color: #9eff00;
 }
 .cart__order-wrap > *:not(:last-child) {
-    margin-right: 10px;
+    margin-right: 10px;   
 }
 
 
@@ -904,11 +904,13 @@ a {
 
 
 
-.cart__order b {
+.cart__order b, 
+.cart__order span {
     font-weight: 500;
     font-size: 16px;
     line-height: 24px
 }
+
 
 .cart__article {
     font-size: 12px;

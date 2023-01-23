@@ -10,7 +10,7 @@
         :checked="value === active"
         @input="$emit('change', $event.target.value)"
       >
-      <span :class="classSpan" v-html="title"></span>
+      <span :class="classSpan">{{ title }}&nbsp;<slot/></span>
     </label>
   </li>
 </template>
