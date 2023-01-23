@@ -142,72 +142,57 @@
 
       <div class="item__desc">
         <ul class="tabs">
-          <li class="tabs__item">
-            <a class="tabs__link tabs__link--current">
-              Описание
-            </a>
-          </li>
-          <li class="tabs__item">
-            <a class="tabs__link" href="#">
-              Характеристики
-            </a>
-          </li>
-          <li class="tabs__item">
-            <a class="tabs__link" href="#">
-              Гарантия
-            </a>
-          </li>
-          <li class="tabs__item">
-            <a class="tabs__link" href="#">
-              Оплата и доставка
-            </a>
+          <li class="tabs__item"
+            v-for="(tab, i) in tabs"
+            :key="i"
+          >
+            <label :for="`tab-input-${i}`">
+              <input
+                :id="`tab-input-${i}`"
+                class="display-none"
+                type="radio"
+                name="tab"
+                :value="i"
+                v-model="activeTab"
+              >
+                <a class="tabs__link" :class="{'tabs__link--current': activeTab === i }">
+                  {{ tab }}
+                </a>
+            </label>
           </li>
         </ul>
 
-        <div class="item__content">
-          <p>
-            Навигация GPS, ГЛОНАСС, BEIDOU Galileo и QZSS<br>
-            Синхронизация со смартфоном<br>
-            Связь по Bluetooth Smart, ANT+ и Wi-Fi<br>
-            Поддержка сторонних приложений<br>
-          </p>
-
-          <a href="#">
-            Все характеристики
-          </a>
-
-          <h3>Что это?</h3>
-
-          <p>
-            Wahoo ELEMNT BOLT GPS – это велокомпьютер, который позволяет
-            оптимизировать свои велотренировки, сделав их максимально эффективными.
-            Wahoo ELEMNT BOLT GPS синхронизируется с датчиками по ANT+, объединяя
-            полученную с них информацию. Данные отображаются на дисплее, а также
-            сохраняются на смартфоне. При этом на мобильное устройство можно
-            установить как фирменное приложение, так и различные приложения
-            сторонних разработчиков. Велокомпьютер точно отслеживает местоположение,
-            принимая сигнал с целого комплекса спутников. Эта информация позволяет
-            смотреть уже преодоленные маршруты и планировать новые велопрогулки.
-          </p>
-
-          <h3>Дизайн</h3>
-
-          <p>
-            Велокомпьютер Wahoo ELEMNT BOLT очень компактный.
-            Размеры устройства составляют всего 74,6 x 47,3 x 22,1 мм.
-            что не превышает габариты смартфона. Корпус гаджета выполнен
-            из черного пластика. На обращенной к пользователю стороне расположен
-            дисплей диагональю 56 мм. На дисплей выводятся координаты и скорость, а
-            также полученная со смартфона и синхронизированных датчиков информация:
-            интенсивность, скорость вращения педалей, пульс и т.д. (датчики
-            не входят в комплект поставки). Корпус велокомпьютера имеет степень
-            защиты от влаги IPX7. Это означает, что устройство не боится пыли, а
-            также выдерживает кратковременное (до 30 минут) погружение в воду на
-            глубину не более 1 метра.
+        <div class="item__content" v-show="activeTab === 0">
+          <p v-for="item in specifications" :key="item.id">
+            {{ item.title }}:&nbsp;{{ item.value }}
           </p>
         </div>
+        <div class="item__content" v-show="activeTab === 1">
+          <p>
+
+          </p>
+        </div>
+        <div class="item__content" v-show="activeTab === 2">
+          <p>
+            Срок гарантии: 1 год
+          </p>
+        </div>
+        <div class="item__content" v-show="activeTab === 3">
+          <h3>Самовывоз</h3>
+          <p>Бесплатно. Данную опцию Вы сможете выбрать при оформлении заказа.</p>
+          <h3>Курьером</h3>
+          <p>
+            Цена доставки курьером составляет 500 рублей.
+            Данную опцию Вы сможете выбрать при оформлении заказа.
+            Доставка будет включена в стоимость.
+          </p>
+
+        </div>
+
       </div>
+
     </section>
+
   </main>
 </template>
 
@@ -235,6 +220,8 @@ export default {
       activeOfferId: '',
       offerTitleDefault: '',
       message: '',
+      tabs: ['Описание', 'Характеристики', 'Гарантия', 'Оплата и доставка'],
+      activeTab: 0,
     };
   },
   filters: {
@@ -308,6 +295,9 @@ export default {
 
       return this.activeColorCode !== '';
     },
+    specifications() {
+      return this.productData.specifications;
+    },
   },
   methods: {
     ...mapActions(['addProductToCart']),
@@ -368,6 +358,9 @@ export default {
     replaceSimbols(a, b, str) {
       return str.replace(RegExp(`${a}`, 'gi'), `${b}`);
     },
+    qwe(i) {
+      this.activeTab = i;
+    },
   },
   // created() {
   //   this.loadProducts();
@@ -390,4 +383,9 @@ export default {
   color: red
 .img
   height: unset
+
+.tabs__link
+  cursor: pointer
+.display-none
+  display: none
 </style>
