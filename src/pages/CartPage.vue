@@ -47,7 +47,7 @@
           <router-link
             v-if="totalProducts !== 0"
             tag="button"
-            :to="{name: 'order'}"
+            :to="{ name: 'order' }"
             class="cart__button button button--primery"
             type="submit"
           >
@@ -70,9 +70,9 @@ export default {
   components: { CartItem },
   computed: {
     ...mapGetters({
-      products: 'cartDetailProducts',
-      totelPrice: 'cartTotalPrice',
-      totalProducts: 'cartTotalProducts',
+      products: 'basketProductsDetail',
+      totelPrice: 'basketTotalPrice',
+      totalProducts: 'basketTotalProducts',
     }),
   },
 };

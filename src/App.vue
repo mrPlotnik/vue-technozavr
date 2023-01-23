@@ -17,7 +17,7 @@ import { mapActions, mapMutations } from 'vuex';
 export default {
   components: { Header, Footer },
   methods: {
-    ...mapActions(['loadCart']),
+    ...mapActions(['loadBasket']),
     ...mapMutations(['updateUserAccessKey']),
   },
   // В хуке created
@@ -28,8 +28,8 @@ export default {
     if (userAccessKey) {
       this.updateUserAccessKey(userAccessKey);
     }
-    // вызываем экшн
-    this.loadCart();
+    // Загружаем информацио о корзине
+    this.loadBasket();
   },
 };
 </script>

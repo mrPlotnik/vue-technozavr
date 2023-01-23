@@ -1,5 +1,6 @@
 <template>
   <li class="cart__item product">
+
     <div class="product__pic">
       <img
         :src="item.product.image"
@@ -8,9 +9,13 @@
         :alt="item.product.title"
       >
     </div>
+
     <h3 class="product__title">
-      {{ item.product.title }}
+      {{ item.product.productOffer.title }}
     </h3>
+    <p class="product__info">
+      {{ mainPropTitle }}:&nbsp;<span>{{ propValue }}</span>
+    </p>
     <span class="product__code">
       Артикул: {{ item.product.id }}
     </span>
@@ -26,9 +31,9 @@
         </svg>
       </button>
 
-      <label for="qwe">
+      <label :for="`product-quantity-${item.basketItemId}`">
         <input
-          id="qwe"
+          :id="`product-quantity-${item.basketItemId}`"
           type="text"
           v-model.number="quantity"
           @keypress="onlyNumeric($event)"
@@ -55,7 +60,7 @@
       class="product__del button-del"
       type="button"
       aria-label="Удалить товар из корзины"
-      @click.prevent="deleteProduct(item.productId)"
+      @click.prevent="deleteProduct(item.product.id)"
     >
       <svg width="20" height="20" fill="currentColor">
         <use xlink:href="#icon-close"></use>
@@ -69,6 +74,7 @@
 import numberFormat from '@/helpers/numberFormat';
 import { mapActions } from 'vuex';
 import xCrement from '@/helpers/xCrement';
+import onlyNumeric from '@/helpers/onlyNumeric';
 
 export default {
   name: 'CartItem',
@@ -81,25 +87,29 @@ export default {
       },
       // при изменении поля
       set(value) {
-        this.$store.dispatch('updateCartProductQuantity', { productId: this.item.id, quantity: value });
+        this.$store.dispatch('updateCartProductQuantity', { basketItemId: this.item.product.id, quantity: value });
       },
+    },
+    // Название главного свойства товара
+    mainPropTitle() {
+      return this.item.product.productOffer.product.mainProp.title;
+    },
+    propValue() {
+      const { value } = this.item.product.productOffer.propValues[0];
+      return value;
     },
   },
   methods: {
-    ...mapActions({ deleteCartProduct: 'deleteCartProduct' }),
+    ...mapActions({ deleteBasketProduct: 'deleteBasketProduct' }),
     xCrement,
-    deleteProduct(productId) {
-      this.deleteCartProduct({ productId });
-    },
-    // Можно вести только число
-    onlyNumeric(e) {
-      const num = String.fromCharCode(e.keyCode);
-      if (/^\d+$/.test(num)) {
-        return false;
-      }
-      e.preventDefault();
-      return true;
+    onlyNumeric,
+    deleteProduct(basketItemId) {
+      this.deleteBasketProduct({ basketItemId });
     },
   },
 };
 </script>
+<style scoped lang="sass">
+button
+  cursor: pointer
+</style>

@@ -1,6 +1,5 @@
 <template>
-  <div></div>
-  <!-- <router-link
+  <router-link
     class="header__cart"
     :to="{name: 'cart'}"
     aria-label="Корзина с товарами"
@@ -14,18 +13,18 @@
     >
       {{ totalProducts }}
     </span>
-  </router-link> -->
+  </router-link>
 </template>
 
 <script>
-// import { mapGetters } from 'vuex';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'CartIndicator',
   computed: {
-    // ...mapGetters({
-    //   totalProducts: 'cartTotalProducts',
-    // }),
+    ...mapGetters({
+      totalProducts: 'basketTotalProducts',
+    }),
   },
 };
 </script>
