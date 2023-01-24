@@ -6,8 +6,8 @@
         :class="classInput"
         type="radio"
         :name="name"
-        :value="value"
-        :checked="value === active"
+        :value="id"
+        :checked="id === active"
         @input="$emit('change', $event.target.value)"
       >
       <span :class="classSpan">{{ title }}&nbsp;<slot/></span>

@@ -1,73 +1,76 @@
 <template>
-  <main class="content container">
-    <div class="content__top content__top--catalog">
-      <h1 class="content__title">Каталог</h1>
-      <span class="content__info">{{ countProducts }} товара</span>
-    </div>
+  <div>
 
-    <div class="content__catalog">
+    <!-- Пока выполняется запрос к серверу, показываем прелоадер -->
+    <PreLoader v-show="productsLoading"/>
 
-      <!-- Здесь показываем фильтр товаров -->
-      <ProductFilter
-        :price-from.sync="filterPriceFrom"
-        :price-to.sync="filterPriceTo"
-        :category-id.sync="filterCategoryId"
-        :categoryMainPropSlug.sync='filterCategoryMainPropSlug'
-        :sku.sync="filterSku"
-        @loadProductsByFilters="loadProducts"
-        @resetFilters="resetFilters"
-      />
+    <main class="content container">
+      <div class="content__top content__top--catalog">
+        <h1 class="content__title">Каталог</h1>
+        <span class="content__info">{{ countProducts }} товара</span>
+      </div>
 
-      <section class="catalog">
+      <div class="content__catalog">
 
-        <!-- Пока выполняется запрос к серверу, показываем прелоадер -->
-        <PreLoader v-if="productsLoading"/>
-
-        <!-- Если есть ошибка загрузки данных с сервера -->
-        <div v-else-if="productsLoadingFailed">
-          Произошла ошибка при загрузке товаров<br>
-          <button @click.prevent="loadProducts">Попробовать еще раз</button>
-        </div>
-
-        <!-- Здесь показываем все товары -->
-        <ProductList
-          :products="products"
+        <!-- Здесь показываем фильтр товаров -->
+        <ProductFilter
+          :price-from.sync="filterPriceFrom"
+          :price-to.sync="filterPriceTo"
+          :category-id.sync="filterCategoryId"
+          :categoryMainPropSlug.sync='filterCategoryMainPropSlug'
+          :sku.sync="filterSku"
+          @loadProductsByFilters="loadProducts"
+          @resetFilters="resetFilters"
         />
 
-        <!-- Здесь показываем пагинацию -->
-        <BasePagination
-          :page.sync="page"
-          :count="countProducts"
-          :per-page="productsPerPage"
-        />
+        <section class="catalog">
 
-        <!-- Указываем сколько товаров отображать на странице -->
-        <div class="catalog__productsPerPage-wrap">
-          <span>Количество товаров на странице</span>
-          <label for="productsPerPage">
-            <select
-              id="productsPerPage"
-              name="productsPerPage"
-              type="text"
-              v-model="productsPerPage"
-            >
-              <option value="3">3</option>
-              <option value="9">9</option>
-              <option value="12">12</option>
-              <option value="18">18</option>
-              <option value="24">24</option>
-              <option value="27">27</option>
-              <option value="32">32</option>
-            </select>
-          </label>
-        </div>
+          <!-- Если есть ошибка загрузки данных с сервера -->
+          <div v-if="productsLoadingFailed">
+            Произошла ошибка при загрузке товаров<br>
+            <button @click.prevent="loadProducts">Попробовать еще раз</button>
+          </div>
 
-        <!-- <button @click="reduceWay([`https://vue-study.skillbox.cc/api/products/1`,`https://vue-study.skillbox.cc/api/products/2`,`https://vue-study.skillbox.cc/api/products/3`])">123</button> -->
+          <!-- Здесь показываем все товары -->
+          <ProductList
+            :products="products"
+          />
 
-      </section>
+          <!-- Здесь показываем пагинацию -->
+          <BasePagination
+            :page.sync="page"
+            :count="countProducts"
+            :per-page="productsPerPage"
+          />
 
-    </div>
-  </main>
+          <!-- Указываем сколько товаров отображать на странице -->
+          <div class="catalog__productsPerPage-wrap">
+            <span>Количество товаров на странице</span>
+            <label for="productsPerPage">
+              <select
+                id="productsPerPage"
+                name="productsPerPage"
+                type="text"
+                v-model="productsPerPage"
+              >
+                <option value="3">3</option>
+                <option value="9">9</option>
+                <option value="12">12</option>
+                <option value="18">18</option>
+                <option value="24">24</option>
+                <option value="27">27</option>
+                <option value="32">32</option>
+              </select>
+            </label>
+          </div>
+
+          <!-- <button @click="reduceWay([`https://vue-study.skillbox.cc/api/products/1`,`https://vue-study.skillbox.cc/api/products/2`,`https://vue-study.skillbox.cc/api/products/3`])">123</button> -->
+
+        </section>
+
+      </div>
+    </main>
+  </div>
 </template>
 
 <script>
@@ -195,20 +198,9 @@ export default {
     productsPerPage() {
       this.loadProducts();
     },
-    // Свойства фильтрации
-    // filterCategoryId() {
-    //   this.loadProducts();
-    // },
-    // filterPriceFrom() {
-    //   this.loadProducts();
-    // },
-    // filterPriceTo() {
-    //   this.loadProducts();
-    // },
   },
   created() {
     this.loadProducts();
   },
-
 };
 </script>

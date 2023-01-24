@@ -30,11 +30,17 @@ export default {
 
 <style scoped lang="sass">
   .preloader-wrap
-    position: absolute
+    position: fixed
     display: flex
     align-items: center
-    width: 100%
-    height: 100%
+    // width: 100%
+    // height: 100%
+    top: 0
+    right: 0
+    bottom: 0
+    left: 0
+    // background-color: rgb(0 0 0 / 50%)
+    z-index: 10
 
 .loader
   position: relative
@@ -45,7 +51,7 @@ export default {
   font-size: 200%
   text-align: center
   background: #9eff00
-  text-shadow: 5px 5px 5px rgba(0,0,0,0.3)
+  // text-shadow: 5px 5px 5px rgba(0,0,0,0.3)
 
 .loader:after
   content: ""
@@ -68,7 +74,7 @@ span
   width: 100%
 
 .covers span
-  background: white
+  background: rgb(0 0 0 / 60%)
   animation: up 1.5s infinite
 
 @keyframes up

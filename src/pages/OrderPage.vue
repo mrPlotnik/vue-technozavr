@@ -36,11 +36,12 @@
 
     <section class="cart">
 
+      <PreLoader v-show="preloader"/>
+
       <form class="cart__form form" action="#" method="POST" @submit.prevent="order">
 
-        <PreLoader v-if="preloader"/>
+        <div class="cart__field">
 
-        <div class="cart__field" v-else>
           <div class="cart__data">
             <BaseFormText
               v-for="input in inputsText"
@@ -72,7 +73,10 @@
             />
           </div>
 
+          <!-- Доставка и оплата -->
           <div class="cart__options">
+
+            <!-- Доставка -->
             <h3 class="cart__title">Доставка</h3>
             <ul class="cart__options options">
               <OrderInputRadio
@@ -86,13 +90,14 @@
                 :title="input.title"
                 :active="activeDelivery"
                 :value="input.value"
-                :name="input.name"
-                @change="activeDelivery = $event"
+                name="Доставка"
+                @change="activeDelivery = Number($event)"
               >
-                <b>{{ input.amount }}</b>
+                <b>{{ input.price }}</b>
               </OrderInputRadio>
             </ul>
 
+            <!-- Оплата -->
             <h3 class="cart__title">Оплата</h3>
             <ul class="cart__options options">
               <OrderInputRadio
@@ -106,10 +111,11 @@
                 :title="input.title"
                 :active="activePayment"
                 :value="input.value"
-                :name="input.name"
+                name="Оплата"
                 @change="activePayment = $event"
               />
             </ul>
+
           </div>
 
         </div>
@@ -119,7 +125,7 @@
           :products="products"
           :totelPrice="totelPrice"
           :totalProducts="totalProducts"
-          :delivery="delivery"
+          :delivery="deliveryPrice"
           :error="formErrorMessage"
         >
           <button class="cart__button button button--primery" type="submit">
@@ -151,7 +157,8 @@ export default {
   data() {
     return {
       preloader: false,
-      activeDelivery: 'courier',
+      paymentsPreloader: false,
+      activeDelivery: 2,
       activePayment: 'card',
       formError: {},
       formErrorMessage: '',
@@ -174,22 +181,8 @@ export default {
           id: 'order-comment', name: 'comment', title: 'Комментарий к заказу', placeholder: 'Ваши пожелания', value: '',
         },
       ],
-      deliveryInputsRadio: [
-        {
-          id: 'delivery-pickup', title: 'Самовывоз', name: 'delivery', value: 'pickup', amount: 'бесплатно',
-        },
-        {
-          id: 'delivery-courier', title: 'Курьером', name: 'delivery', value: 'courier', amount: '500 ₽',
-        },
-      ],
-      paymentInputsRadio: [
-        {
-          id: 'payment-card', title: 'Картой при получении', name: 'payment', value: 'card',
-        },
-        {
-          id: 'payment-cash', title: 'Наличными при получении', name: 'payment', value: 'cash',
-        },
-      ],
+      deliveryInputsRadio: [],
+      paymentInputsRadio: [],
     };
   },
   computed: {
@@ -200,16 +193,16 @@ export default {
     }),
     formData() {
       return {
-        name: this.inputsText.find((el) => el.name === 'name').value,
-        address: this.inputsText.find((el) => el.name === 'address').value,
-        phone: this.inputsText.find((el) => el.name === 'phone').value,
-        email: this.inputsText.find((el) => el.name === 'email').value,
+        name: this.inputsText.find((e) => e.name === 'name').value,
+        address: this.inputsText.find((e) => e.name === 'address').value,
+        phone: this.inputsText.find((e) => e.name === 'phone').value,
+        email: this.inputsText.find((e) => e.name === 'email').value,
       };
     },
-    delivery() {
-      return this.activeDelivery === 'courier'
-        ? this.deliveryInputsRadio.find((e) => e.value === 'courier').amount
-        : this.deliveryInputsRadio.find((e) => e.value === 'pickup').amount;
+    deliveryPrice() {
+      return this.deliveryInputsRadio.length !== 0
+        ? this.deliveryInputsRadio.find((e) => e.id === this.activeDelivery).price
+        : [];
     },
   },
   methods: {
@@ -243,11 +236,45 @@ export default {
       this.inputsText.find((el) => el.name === 'phone').error = this.formError.phone;
       this.inputsText.find((el) => el.name === 'email').error = this.formError.email;
     },
+    loadDeliveries() {
+      this.preloader = true;
+      axios
+        .get(`${API_BASE_URL}/api/deliveries`)
+        .then((response) => {
+          this.preloader = false;
+          this.deliveryInputsRadio = response.data;
+        })
+        .catch(() => {
+          // На случай ошибки
+        });
+    },
+    loadPayments() {
+      this.preloader = true;
+      axios
+        .get(`${API_BASE_URL}/api/payments`, {
+          params: {
+            deliveryTypeId: this.activeDelivery,
+          },
+        })
+        .then((response) => {
+          this.preloader = false;
+          this.paymentInputsRadio = response.data;
+        })
+        .catch(() => {
+          // На случай ошибки
+        });
+    },
   },
   watch: {
     formError() {
       this.error();
     },
+    activeDelivery() {
+      this.loadPayments();
+    },
+  },
+  created() {
+    this.loadDeliveries();
   },
 };
 </script>
