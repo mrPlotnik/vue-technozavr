@@ -64,12 +64,11 @@
             </label>
           </div>
 
-          <!-- <button @click="reduceWay([`https://vue-study.skillbox.cc/api/products/1`,`https://vue-study.skillbox.cc/api/products/2`,`https://vue-study.skillbox.cc/api/products/3`])">123</button> -->
-
         </section>
 
       </div>
     </main>
+
   </div>
 </template>
 
@@ -105,6 +104,7 @@ export default {
     };
   },
   computed: {
+    // Для удобства
     products() {
       return this.productsData
         // Если this.productsData === true, то возвращаем товары
@@ -116,6 +116,7 @@ export default {
         // Если this.productsData === false, то возвращаем пустой массив
         : [];
     },
+    // Всего товаров
     countProducts() {
       // Если this.productsData === true, то возвращаем общее количество товаров,
       // Если this.productsData === false, то возвращаем 0
@@ -123,6 +124,7 @@ export default {
     },
   },
   methods: {
+    // Загружаем продукты. С фильтрами или без
     loadProducts() {
       // Показываем прелоадер
       this.productsLoading = true;
@@ -180,6 +182,7 @@ export default {
           });
       }, 0);
     },
+    // Сброс всех фильтров
     resetFilters() {
       this.filterPriceFrom = 0;
       this.filterPriceTo = 0;

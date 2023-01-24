@@ -42,7 +42,10 @@
 
         <div class="cart__field">
 
+          <!-- Инпуты -->
           <div class="cart__data">
+
+            <!-- ФИО, адрес, email, телефон -->
             <BaseFormText
               v-for="input in inputsText"
               :key="input.id"
@@ -57,6 +60,8 @@
               :placeholder="input.placeholder"
               v-model="input.value"
             />
+
+            <!-- Комментарий -->
             <BaseFormTextarea
               v-for="input in inputsTextarea"
               :key="input.id"
@@ -64,7 +69,7 @@
               classParent="form__input-wrap--area"
               classLabel="form__label"
               classInput="form__input form__input--area"
-              :name="input.name"
+              name="comment"
               :type="input.type"
               :title="input.title"
               :error="input.error"
@@ -112,7 +117,7 @@
                 :active="activePayment"
                 :value="input.value"
                 name="Оплата"
-                @change="activePayment = $event"
+                @change="activePayment = Number($event)"
               />
             </ul>
 
@@ -122,8 +127,8 @@
 
         <!-- Список товаров -->
         <OrderList
-          :products="products"
-          :totelPrice="totelPrice"
+          :products="offers"
+          :totalPrice="Number(totalPrice)"
           :totalProducts="totalProducts"
           :delivery="deliveryPrice"
           :error="formErrorMessage"
@@ -158,8 +163,8 @@ export default {
     return {
       preloader: false,
       paymentsPreloader: false,
-      activeDelivery: 2,
-      activePayment: 'card',
+      activeDelivery: null,
+      activePayment: null,
       formError: {},
       formErrorMessage: '',
       inputsText: [
@@ -188,7 +193,7 @@ export default {
   computed: {
     ...mapGetters({
       products: 'basketProductsDetail',
-      totelPrice: 'basketTotalPrice',
+      totalPrice: 'basketTotalPrice',
       totalProducts: 'basketTotalProducts',
     }),
     formData() {
@@ -197,12 +202,23 @@ export default {
         address: this.inputsText.find((e) => e.name === 'address').value,
         phone: this.inputsText.find((e) => e.name === 'phone').value,
         email: this.inputsText.find((e) => e.name === 'email').value,
+        deliveryTypeId: this.activeDelivery,
+        paymentTypeId: this.activePayment,
+        comment: this.inputsTextarea.find((e) => e.name === 'comment').value,
       };
     },
     deliveryPrice() {
       return this.deliveryInputsRadio.length !== 0
         ? this.deliveryInputsRadio.find((e) => e.id === this.activeDelivery).price
         : [];
+    },
+    offers() {
+      const newArr = [];
+      this.products.forEach((e) => {
+        const obj = e.product;
+        newArr.push(obj);
+      });
+      return newArr;
     },
   },
   methods: {
@@ -220,8 +236,11 @@ export default {
         })
         .then((response) => {
           this.preloader = false;
+          // Очищаем корзину
           this.$store.commit('resetCart');
+          // Обновляем заказ в state
           this.$store.commit('updateOrderInfo', response.data);
+          // Переходим на страницу
           this.$router.push({ name: 'orderInfo', params: { id: response.data.id } });
         })
         .catch((error) => {
@@ -243,6 +262,8 @@ export default {
         .then((response) => {
           this.preloader = false;
           this.deliveryInputsRadio = response.data;
+          // Первый элемент массива будет значением по умолчанию
+          this.activeDelivery = response.data[0].id;
         })
         .catch(() => {
           // На случай ошибки
@@ -259,6 +280,8 @@ export default {
         .then((response) => {
           this.preloader = false;
           this.paymentInputsRadio = response.data;
+          // Первый элемент массива будет значением по умолчанию
+          this.activePayment = response.data[0].id;
         })
         .catch(() => {
           // На случай ошибки

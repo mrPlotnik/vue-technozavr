@@ -1,8 +1,8 @@
 <template>
   <li :class="classParent">
-    <label :class="classLabel" :for="id">
+    <label :class="classLabel" :for="`input-${name}-${id}`">
       <input
-        :id="id"
+        :id="`input-${name}-${id}`"
         :class="classInput"
         type="radio"
         :name="name"

@@ -1,5 +1,7 @@
 <template>
   <main class="content container">
+
+    <!-- Хлеьные крошки -->
     <div class="content__top">
       <ul class="breadcrumbs">
         <li class="breadcrumbs__item">
@@ -29,7 +31,7 @@
         <div class="cart__field">
           <p class="cart__message">
             Благодарим за&nbsp;выбор нашего магазина.
-             На&nbsp;Вашу почту придет письмо с&nbsp;деталями заказа.
+            На&nbsp;Вашу почту придет письмо с&nbsp;деталями заказа.
             Наши менеджеры свяжутся с&nbsp;Вами в&nbsp;течение часа для уточнения деталей доставки.
           </p>
 
@@ -66,12 +68,23 @@
                 {{ orderInfo.email }}
               </span>
             </li>
+
+            <li class="dictionary__item">
+              <span class="dictionary__key">
+                Способ доставки
+              </span>
+              <span class="dictionary__value">
+                {{ orderInfo.deliveryType.title }}&nbsp;
+                ({{ orderInfo.deliveryType.price | numberFormat }}&nbsp;₽)
+              </span>
+            </li>
+
             <li class="dictionary__item">
               <span class="dictionary__key">
                 Способ оплаты
               </span>
               <span class="dictionary__value">
-                ТУТ НУЖНО ПОПРАВИТЬ ПОТОМ
+                {{ orderInfo.paymentType }}
               </span>
             </li>
           </ul>
@@ -79,8 +92,9 @@
 
         <OrderList
           :products="orderInfo.basket.items"
-          :totelPrice="orderInfo.totalPrice"
-          :totalProducts="orderInfo.basket.items.length"
+          :totalPrice="Number(orderInfo.totalPrice)"
+          :totalProducts="totalProducts"
+          :delivery="orderInfo.deliveryType.price"
         />
 
       </form>
@@ -97,14 +111,23 @@ export default {
   components: { OrderList },
   filters: { numberFormat },
   computed: {
+    // Получаем информацию о корзине из state
     orderInfo() {
       return this.$store.getters.orderInfo ? this.$store.getters.orderInfo : {};
     },
+    totalProducts() {
+      return this.orderInfo.basket.items.reduce((acc, e) => e.quantity + acc, 0);
+    },
   },
   created() {
+    // Оптимизация, чтобы не делать ненужный (дублирующий) запрос
+    // Если заказ не пустой и id заказа из state === id "в строке браузера"
     if (this.$store.state.orderInfo && this.$store.state.orderInfo.id === this.$route.params.id) {
       return;
     }
+    // Загружаем данные заказа из с сервера
+    // Этот экшн вызовет мутацию,
+    // которая сделает запрос к серверу и запишет полученные данные в state
     this.$store.dispatch('loadOrderInfo', this.$route.params.id);
   },
 };

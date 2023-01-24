@@ -13,11 +13,13 @@ export default new Vuex.Store({
     orderInfo: null,
   },
   getters: {
+    // Получаем информацию о корзине. Вызывается из
+    // OrderInfoPage.vue
     orderInfo(state) {
       return state.orderInfo;
     },
     // Получаем информацию о корзине. Вызывается из
-    // cartPage.vue
+    // CartPage.vue
     basketProductsDetail(state) {
       return state.cartProducts.map((item) => {
         const product = state.cartProductsData.find((p) => p.id === item.basketItemId);
@@ -30,13 +32,13 @@ export default new Vuex.Store({
         };
       });
     },
-    // Вся стоимость конзины. Вызывается из
-    // cartPage.vue
+    // Получаем всю стоимость конзины. Вызывается из
+    // CartPage.vue
     basketTotalPrice(state, getters) {
       return getters.basketProductsDetail.reduce((p, i) => (i.product.price * i.quantity) + p, 0);
     },
-    // Всего товаров в корзине. Вызывается из
-    // cartPage.vue
+    // Получаем общее количество товаров в корзине. Вызывается из
+    // CartPage.vue
     basketTotalProducts(state, getters) {
       return (getters.basketProductsDetail.reduce((p, i) => Number(i.quantity) + p, 0));
     },
@@ -47,10 +49,13 @@ export default new Vuex.Store({
     updateUserAccessKey(state, accessKey) {
       state.userAccessKey = accessKey;
     },
-
+    // Обновляем заказ в state. Вызывается из
+    // OrderPage.vue
     updateOrderInfo(state, orderInfo) {
       state.orderInfo = orderInfo;
     },
+    // Очистка корзины. Вызывается из
+    // OrderPage.vue
     resetCart(state) {
       state.cartProducts = [];
       state.cartProductsData = [];
@@ -107,7 +112,8 @@ export default new Vuex.Store({
           context.commit('syncBasketProducts');
         });
     },
-
+    // Загружаем данные заказа
+    // OrderPageInfo.vue
     loadOrderInfo(context, orderId) {
       return axios
         .get(`${API_BASE_URL}/api/orders/${orderId}`, {
