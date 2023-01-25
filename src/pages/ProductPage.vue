@@ -33,6 +33,8 @@
     </div>
 
     <section class="item">
+
+      <!-- Картинка -->
       <div class="item__pics pics">
         <div class="pics__wrapper">
           <img
@@ -45,6 +47,7 @@
       </div>
 
       <div class="item__info">
+
         <span class="item__code">Артикул: {{ product.id }}</span>
         <h2 class="item__title"> {{ activeOfferTitle }}</h2>
         <div class="item__form">
@@ -148,6 +151,8 @@
       </div>
 
       <div class="item__desc">
+
+        <!-- вкладки -->
         <ul class="tabs">
           <li class="tabs__item"
             v-for="(tab, i) in tabs"
@@ -169,21 +174,26 @@
           </li>
         </ul>
 
+        <!-- Описание -->
         <div class="item__content" v-show="activeTab === 0">
           <p v-for="item in specifications" :key="item.id">
             {{ item.title }}:&nbsp;{{ item.value }}
           </p>
         </div>
-        <div class="item__content" v-show="activeTab === 1">
-          <p>
 
-          </p>
+        <!-- Заголовки -->
+        <div class="item__content" v-show="activeTab === 1">
+          <p></p>
         </div>
+
+        <!-- Гарантия -->
         <div class="item__content" v-show="activeTab === 2">
           <p>
             Срок гарантии: 1 год
           </p>
         </div>
+
+        <!-- Оплата и доставка -->
         <div class="item__content" v-show="activeTab === 3">
           <h3>Самовывоз</h3>
           <p>Бесплатно. Данную опцию Вы сможете выбрать при оформлении заказа.</p>
@@ -205,7 +215,6 @@
 
 <script>
 import PreLoader from '@/components/PreLoader.vue';
-import gotoPage from '@/helpers/gotoPage';
 import numberFormat from '@/helpers/numberFormat';
 import axios from 'axios';
 import { mapActions } from 'vuex';
@@ -235,12 +244,15 @@ export default {
     numberFormat,
   },
   computed: {
+    // Текущий товар с URL картики
     product() {
       return { ...this.productData, image: this.productData.preview.file.url };
     },
+    // Данные категории
     category() {
       return this.productData.category;
     },
+    // Офферы данного товара
     offersData() {
       const arr = [];
       this.productData.offers.forEach((e) => {
@@ -266,9 +278,11 @@ export default {
       }
       return arr;
     },
+    // Цвета оффера
     colors() {
       const arr = [];
 
+      // Для самокатов
       if (this.category.id === 4) {
         this.offersData.forEach((e) => {
           arr.push(e.colorInfo);
@@ -276,6 +290,7 @@ export default {
         return arr;
       }
 
+      // Для всех остальных товаров
       this.productData.colors.forEach((el) => {
         arr.push({
           title: el.color.title,
@@ -308,7 +323,6 @@ export default {
   },
   methods: {
     ...mapActions(['addProductToBasket']),
-    gotoPage,
     xCrement,
     addToCart() {
       this.message = '';
