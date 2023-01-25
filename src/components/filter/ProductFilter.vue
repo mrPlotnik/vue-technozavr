@@ -136,8 +136,13 @@ export default {
       return this.categoriesData ? this.categoriesData.items : [];
     },
     // Выбранная (текущая) категория
-    currentСategory() {
-      return this.categoryId;
+    currentСategory: {
+      get() {
+        return this.categoryId;
+      },
+      set(value) {
+        return value;
+      },
     },
   },
   watch: {

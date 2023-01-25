@@ -31,7 +31,6 @@
 </template>
 
 <script>
-import gotoPage from '@/helpers/gotoPage';
 import ProductBtns from '@/components/product/ProductBtns.vue';
 import numberFormat from '@/helpers/numberFormat';
 
@@ -99,7 +98,6 @@ export default {
     },
   },
   methods: {
-    gotoPage,
     replaceSimbols(a, b, str) {
       return str.replace(RegExp(`${a}`, 'gi'), `${b}`);
     },
