@@ -18,7 +18,18 @@
 
     <!-- Основное свойство товара -->
     <p class="product__info">
-      {{ mainPropTitle }}:&nbsp;<span>{{ propValue }}</span>
+
+      <!-- Название основного свойства товара -->
+      {{ mainPropTitle }}:&nbsp;
+
+      <!-- Показывает цвет, если основное свойство === 'Цвет', т.е. самокат -->
+      <span v-show="mainPropTitle === 'Цвет'">
+        <span class="color" :style="{backgroundColor: color}"></span>
+      </span>
+
+      <!-- Значение основного свойства товара -->
+      <span>{{ propValue }}</span>
+
     </p>
 
     <!-- Артикул -->
@@ -103,26 +114,39 @@ export default {
         this.$store.dispatch('updateBasketProductQuantity', { basketItemId: this.item.product.id, quantity: value });
       },
     },
-    // Название главного свойства товара
+    // Название основного свойства товара
     mainPropTitle() {
       return this.item.product.productOffer.product.mainProp.title;
     },
+    // Значение основного свойства товара
     propValue() {
       const { value } = this.item.product.productOffer.propValues[0];
       return value;
+    },
+    // Цвет товара (только для самокатов)
+    color() {
+      return this.item.product.color.color.code;
     },
   },
   methods: {
     ...mapActions({ deleteBasketProduct: 'deleteBasketProduct' }),
     xCrement,
     onlyNumeric,
+    // Удаление товара из корзины
     deleteProduct(basketItemId) {
       this.deleteBasketProduct({ basketItemId });
     },
   },
 };
 </script>
+
 <style scoped lang="sass">
-button
-  cursor: pointer
+  button
+    cursor: pointer
+  .color
+    display: flex
+    width: 20px
+    height: 20px
+    border-radius: 50%
+    margin-right: 2px
 </style>

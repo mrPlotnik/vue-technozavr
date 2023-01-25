@@ -103,6 +103,8 @@ export default {
       productsData: null,
     };
   },
+  // Через роутер могут быть переданы входные параметры
+  props: ['categoryId'],
   computed: {
     // Для удобства
     products() {
@@ -121,6 +123,10 @@ export default {
       // Если this.productsData === true, то возвращаем общее количество товаров,
       // Если this.productsData === false, то возвращаем 0
       return this.productsData ? this.productsData.pagination.total : 0;
+    },
+    // Категория товара (могут быть переданы через роутер)
+    inputCategoryId() {
+      return this.categoryId ? this.categoryId : null;
     },
   },
   methods: {
@@ -203,6 +209,9 @@ export default {
     },
   },
   created() {
+    if (this.inputCategoryId) {
+      this.filterCategoryId = this.inputCategoryId;
+    }
     this.loadProducts();
   },
 };

@@ -965,6 +965,8 @@ a {
 }
 
 .product__info {
+    display: flex;
+    align-items: center;
     grid-row: 2/3;
     font-size: 14px;
     line-height: 1;

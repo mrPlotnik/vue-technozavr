@@ -51,7 +51,7 @@
             class="form__select"
             type="text"
             name="category"
-            v-model.number="currentCategoryId"
+            v-model.number="currentСategory"
             @input="filterByCategoryClick($event.target.value)"
           >
             <option value="0">Все категории</option>
@@ -120,7 +120,6 @@ export default {
       currentPriceFrom: 0,
       currentPriceTo: 0,
       currentCategoryId: 0,
-
       currentSku: [],
 
       currentCategoryMainProp: '',
@@ -132,13 +131,16 @@ export default {
   },
   props: ['priceFrom', 'priceTo', 'categoryId', 'categoryMainPropSlug', 'sku'],
   computed: {
+    // Все категории
     categories() {
       return this.categoriesData ? this.categoriesData.items : [];
     },
+    // Выбранная (текущая) категория
+    currentСategory() {
+      return this.categoryId;
+    },
   },
   watch: {
-    // Например после ресета, галочки не убирались.
-    // Обновляем данные
     priceFrom(value) {
       this.currentPriceFrom = value;
     },
@@ -146,7 +148,6 @@ export default {
       this.currentPriceTo = value;
     },
     categoryId(value) {
-      this.currentCategoryId = value;
       if (value !== 0) this.loadCategoryIdData(value);
     },
     categoryMainPropSlug(value) {

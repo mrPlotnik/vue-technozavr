@@ -5,15 +5,22 @@
 
   <main class="content container" v-else>
 
+    <!-- Хлебные крошки -->
     <div class="content__top">
       <ul class="breadcrumbs">
         <li class="breadcrumbs__item">
-          <router-link class="breadcrumbs__link" :to="{name: 'main'}">
+          <router-link
+            class="breadcrumbs__link"
+            :to="{name: 'main'}"
+          >
             Каталог
           </router-link>
         </li>
         <li class="breadcrumbs__item">
-          <router-link class="breadcrumbs__link" :to="{name: 'main'}">
+          <router-link
+            class="breadcrumbs__link"
+            :to="{name: 'main', params: {categoryId: category.id}}"
+          >
             {{ category.title }}
           </router-link>
         </li>
@@ -373,16 +380,17 @@ export default {
   },
 };
 </script>
-<style scoped lang="sass">
-.message
-  padding: 5px 0
-.message--error
-  color: red
-.img
-  height: unset
 
-.tabs__link
-  cursor: pointer
-.display-none
-  display: none
+<style scoped lang="sass">
+  .message
+    padding: 5px 0
+  .message--error
+    color: red
+  .img
+    height: unset
+
+  .tabs__link
+    cursor: pointer
+  .display-none
+    display: none
 </style>

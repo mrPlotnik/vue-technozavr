@@ -16,7 +16,9 @@ Vue.use(VueRouter);
 // Определяем маршруты
 // Каждому маршруту должен соответствовать компонент
 const routes = [
-  { path: '/', name: 'main', component: MainPage },
+  {
+    path: '/', name: 'main', component: MainPage, props: true,
+  },
   { path: '*', name: 'notFound', component: NotFoundPage },
   { path: '/product/:id', name: 'product', component: ProductPage },
   { path: '/cart', name: 'cart', component: CartPage },
