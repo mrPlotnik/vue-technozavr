@@ -49,7 +49,7 @@
       <button
         type="button"
         aria-label="Убрать один товар"
-        @click.prevent="quantity = xCrement(quantity, false)"
+        @click.prevent="decrement"
       >
         <svg width="10" height="10" fill="currentColor">
           <use xlink:href="#icon-minus"></use>
@@ -142,6 +142,10 @@ export default {
     // Удаление товара из корзины
     deleteProduct(basketItemId) {
       this.deleteBasketProduct({ basketItemId });
+    },
+    decrement() {
+      if (this.quantity === 1) return;
+      this.quantity = xCrement(this.quantity, false);
     },
   },
 };
