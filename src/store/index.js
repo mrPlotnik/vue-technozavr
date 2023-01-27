@@ -40,7 +40,7 @@ export default new Vuex.Store({
     // Получаем общее количество товаров в корзине. Вызывается из
     // CartPage.vue
     basketTotalProducts(state, getters) {
-      return (getters.basketProductsDetail.reduce((p, i) => Number(i.quantity) + p, 0));
+      return (getters.basketProductsDetail.length);
     },
   },
   mutations: {
