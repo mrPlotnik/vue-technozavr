@@ -1,6 +1,7 @@
 <template>
-  <ul class="catalog__pagination pagination">
+  <ul class="catalog__pagination pagination" v-show="count !== 0">
 
+    <!-- Предыдущая страница -->
     <li class="pagination__item">
       <a
         href="#"
@@ -15,6 +16,7 @@
       </a>
     </li>
 
+    <!-- Промежуточные значения -->
     <li
       class="pagination__item"
       v-for="pageNumber in pages"
@@ -30,6 +32,7 @@
       </a>
     </li>
 
+    <!-- Следующая страница -->
     <li class="pagination__item">
       <a
         href="#"

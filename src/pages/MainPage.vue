@@ -44,7 +44,7 @@
           />
 
           <!-- Указываем сколько товаров отображать на странице -->
-          <div class="catalog__productsPerPage-wrap">
+          <div class="catalog__productsPerPage-wrap" v-show="countProducts !== 0">
             <span>Количество товаров на странице</span>
             <label for="productsPerPage">
               <select
