@@ -966,7 +966,8 @@ a {
 
 .product__info {
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     grid-row: 2/3;
     font-size: 14px;
     line-height: 1;
@@ -978,6 +979,14 @@ a {
     display: inline-block;
     padding-left: 30px;
     vertical-align: top
+}
+.product__info p {
+    display: flex;
+    align-items: center;
+    margin: 0;
+}
+.product__info > *:not(:last-child) {
+   margin-bottom: 10px;
 }
 
 .options__value::before,

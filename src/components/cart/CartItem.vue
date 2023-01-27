@@ -17,20 +17,27 @@
     </h3>
 
     <!-- Основное свойство товара -->
-    <p class="product__info">
+    <div class="product__info">
+
+      <!-- Цвет для всех товаров, кроме самокатов -->
+      <p v-show="mainPropTitle !== 'Цвет'">
+        Цвет:&nbsp;<span class="color" :style="{backgroundColor: color}"></span>
+      </p>
 
       <!-- Название основного свойства товара -->
-      {{ mainPropTitle }}:&nbsp;
+      <p>
+        {{ mainPropTitle }}:&nbsp;
 
-      <!-- Показывает цвет, если основное свойство === 'Цвет', т.е. самокат -->
-      <span v-show="mainPropTitle === 'Цвет'">
-        <span class="color" :style="{backgroundColor: color}"></span>
-      </span>
+        <!-- Показывает цвет, если основное свойство === 'Цвет', т.е. самокат -->
+        <span v-show="mainPropTitle === 'Цвет'">
+          <span class="color" :style="{backgroundColor: color}"></span>
+        </span>
 
-      <!-- Значение основного свойства товара -->
-      <span>{{ propValue }}</span>
+        <!-- Значение основного свойства товара -->
+        <span>{{ propValue }}</span>
+      </p>
 
-    </p>
+    </div>
 
     <!-- Артикул -->
     <span class="product__code">
