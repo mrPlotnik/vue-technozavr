@@ -46,6 +46,7 @@
         </div>
       </div>
 
+      <!-- Информация о товаре -->
       <div class="item__info">
 
         <span class="item__code">Артикул: {{ product.id }}</span>
@@ -117,6 +118,7 @@
                     value="1"
                     name="count"
                     v-model.number="productAmount"
+                    @keypress="onlyNumeric($event)"
                   >
                 </label>
 
@@ -150,6 +152,7 @@
         </div>
       </div>
 
+      <!-- Описание (вкладки) -->
       <div class="item__desc">
 
         <!-- вкладки -->
@@ -219,6 +222,7 @@ import numberFormat from '@/helpers/numberFormat';
 import axios from 'axios';
 import { mapActions } from 'vuex';
 import xCrement from '@/helpers/xCrement';
+import onlyNumeric from '@/helpers/onlyNumeric';
 import API_BASE_URL from '../config';
 
 export default {
@@ -324,6 +328,7 @@ export default {
   methods: {
     ...mapActions(['addProductToBasket']),
     xCrement,
+    onlyNumeric,
     addToCart() {
       this.message = '';
 
